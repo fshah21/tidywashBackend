@@ -70,7 +70,7 @@ function getSequelizeInstance() {
     try {
       // Use the singleton instance
       const sequelizeInstance = getSequelizeInstance();
-      await sequelizeInstance.sync({ alter: false });
+      await sequelizeInstance.sync({ alter: true });
       app(req, res); // handle the request
     } catch (error) {
       console.error("Unable to connect to the database:", error);
