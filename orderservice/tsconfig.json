@@ -1,0 +1,24 @@
+{
+    "compilerOptions": {
+      "target": "es6",                 // Specify ECMAScript target version
+      "module": "commonjs",            // Specify module code generation
+      "outDir": "./dist",              // Redirect output structure to the directory
+      "rootDir": "./src",              // Specify the root directory of input files
+      "strict": false,                  // Enable all strict type-checking options
+      "esModuleInterop": true,         // Enables CommonJS/AMD module mode
+      "skipLibCheck": true,            // Skip type checking of declaration files
+      "forceConsistentCasingInFileNames": true, // Disallow inconsistently-cased references to the same file
+      "experimentalDecorators": true,
+      "emitDecoratorMetadata": true,
+      "strictPropertyInitialization": false,
+      "moduleResolution": "node",      // Resolve modules using Node.js style
+      "resolveJsonModule": true,       // Include modules imported with .json extension
+      "lib": ["es6", "dom"],           // Include DOM library for WebSocket and other browser types
+      "types": ["node"],               // Specify type package names to be included without being referenced in a require
+      "noUnusedLocals": true,          // Report errors on unused locals
+      "noUnusedParameters": true,      // Report errors on unused parameters
+      "noImplicitReturns": true        // Report an error when not all code paths in function return a value
+    },
+    "include": ["src/**/*.ts"],        // Glob patterns to include
+    "exclude": ["node_modules"]        // Glob patterns to exclude
+  }
