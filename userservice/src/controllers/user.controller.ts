@@ -103,10 +103,77 @@ export class UserController {
       });
 
       if (existingUser) {
-          return res.status(400).json({ 
-              message: "User with this phone number already exists",
-              user_id: existingUser.id
-          });
+        const userID = existingUser.id;
+        const role = existingUser.role;
+
+        if (role == "customer") {
+            const existingCustomer = await Customer.findOne({
+                where: {
+                    user_id : userID
+                }
+            });
+
+            return res.status(400).json({ 
+                message: "User with this phone number already exists",
+                user: {
+                    id: existingUser.id,
+                    phone_number: existingUser.phone_number,
+                    first_name: existingUser.first_name,
+                    last_name: existingUser.last_name,
+                    created_by: existingUser.created_by,
+                    created_date: existingUser.created_date,
+                    modified_date: existingUser.modified_date,
+                    role: existingUser.role,
+                    customer : {
+                        id: existingCustomer.id,
+                        user_id: existingCustomer.user_id,
+                        created_date: existingCustomer.created_date,
+                        modified_date: existingCustomer.modified_date
+                    }
+                }
+              });
+        } else if (role == "employee") {
+            const existingEmployee = await Customer.findOne({
+                where: {
+                    user_id : userID
+                }
+            });
+
+            return res.status(400).json({ 
+                message: "User with this phone number already exists",
+                user: {
+                    id: existingUser.id,
+                    phone_number: existingUser.phone_number,
+                    first_name: existingUser.first_name,
+                    last_name: existingUser.last_name,
+                    created_by: existingUser.created_by,
+                    created_date: existingUser.created_date,
+                    modified_date: existingUser.modified_date,
+                    role: existingUser.role,
+                    employee : {
+                        id: existingEmployee.id,
+                        user_id: existingEmployee.user_id,
+                        created_date: existingEmployee.created_date,
+                        modified_date: existingEmployee.modified_date
+                    }
+                }
+              });
+        } else  {
+            return res.status(400).json({ 
+                message: "User with this phone number already exists",
+                user: {
+                    id: existingUser.id,
+                    phone_number: existingUser.phone_number,
+                    first_name: existingUser.first_name,
+                    last_name: existingUser.last_name,
+                    created_by: existingUser.created_by,
+                    created_date: existingUser.created_date,
+                    modified_date: existingUser.modified_date,
+                    role: existingUser.role
+                }
+              });
+
+        }
       }
 
       try {
@@ -131,6 +198,7 @@ export class UserController {
                   created_by: newUser.created_by,
                   created_date: newUser.created_date,
                   modified_date: newUser.modified_date,
+                  role: newUser.role,
                   customer : {
                     id: newCustomer.id,
                     user_id: newUser.id,
