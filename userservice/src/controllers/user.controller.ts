@@ -133,7 +133,7 @@ export class UserController {
                 }
               });
         } else if (role == "employee") {
-            const existingEmployee = await Customer.findOne({
+            const existingEmployee = await Employee.findOne({
                 where: {
                     user_id : userID
                 }
