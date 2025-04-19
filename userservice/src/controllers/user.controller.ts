@@ -97,7 +97,7 @@ export class UserController {
           where: {
               phone_number: {
                   number: phone_number.number,
-                  country_code: phone_number.country_code
+                  country_code: "+" + phone_number.country_code
               }
           }
       });
