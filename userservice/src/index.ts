@@ -69,8 +69,11 @@ function getSequelizeInstance() {
   .https.onRequest(async (req, res) => {
     try {
       // Use the singleton instance
+      console.log("IN HTTPS REQUEST");
       const sequelizeInstance = getSequelizeInstance();
+      console.log("LETS SYNC");
       await sequelizeInstance.sync({ alter: true });
+      console.log("Tables synced");
       app(req, res); // handle the request
     } catch (error) {
       console.error("Unable to connect to the database:", error);

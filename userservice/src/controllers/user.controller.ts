@@ -85,11 +85,14 @@ export class UserController {
   
   static async createUser(req: Request, res: Response) {
     try {
+      console.log("CREATE USER METHOD");
       const { phone_number } = req.body;
+      console.log("PHONE NUMBER", req.body);
 
       // Validate required fields
       if (!phone_number || !phone_number.number || !phone_number.country_code) {
-          return res.status(400).json({ message: "Phone number with country code is required" });
+        console.log("VALIDATION ISSUE");
+        return res.status(400).json({ message: "Phone number with country code is required" });
       }
 
       // Check if user with this phone number already exists
@@ -97,12 +100,15 @@ export class UserController {
           where: {
               phone_number: {
                   number: phone_number.number,
-                  country_code: "+" + phone_number.country_code
+                  country_code: phone_number.country_code
               }
           }
       });
 
+      console.log("EXISTING USER", existingUser);
+
       if (existingUser) {
+        console.log("THIS IS AN EXISTING USER");
         const userID = existingUser.id;
         const role = existingUser.role;
 
@@ -112,8 +118,9 @@ export class UserController {
                     user_id : userID
                 }
             });
+            console.log("CUSTOMER", existingCustomer);
 
-            return res.status(400).json({ 
+            return res.status(200).json({ 
                 message: "User with this phone number already exists",
                 user: {
                     id: existingUser.id,
@@ -139,7 +146,7 @@ export class UserController {
                 }
             });
 
-            return res.status(400).json({ 
+            return res.status(200).json({ 
                 message: "User with this phone number already exists",
                 user: {
                     id: existingUser.id,
@@ -159,7 +166,7 @@ export class UserController {
                 }
               });
         } else  {
-            return res.status(400).json({ 
+            return res.status(200).json({ 
                 message: "User with this phone number already exists",
                 user: {
                     id: existingUser.id,
