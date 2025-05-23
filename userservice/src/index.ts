@@ -31,7 +31,7 @@ function getSequelizeInstance() {
         database: "postgres",
         username: "postgres",
         password: "tidywash-prod",
-        host: "/cloudsql/silent-bolt-456117-r7:asia-south1:tidywash-production",
+        host: "/cloudsql/silent-bolt-456117-r7:asia-south1:tidywash-production-final-standard",
         dialect: "postgres",
         models: [User, Employee, Customer],
         pool: {
@@ -41,7 +41,7 @@ function getSequelizeInstance() {
           idle: 10000,
         },
         dialectOptions: {
-          socketPath: '/cloudsql/silent-bolt-456117-r7:asia-south1:tidywash-production',
+          socketPath: '/cloudsql/silent-bolt-456117-r7:asia-south1:tidywash-production-final-standard',
         },
       };
   
