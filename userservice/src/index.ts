@@ -8,6 +8,7 @@ import { User } from "./models/user.model";
 import { runWith } from "firebase-functions";
 import { Employee } from "./models/employee.model";
 import { Customer } from "./models/customer.model";
+import { Address } from "./models/address.model";
 import dns from 'dns';
 import { customerRoutes } from "./routes/customer.routes";
 dns.setDefaultResultOrder('ipv4first');
@@ -45,7 +46,7 @@ function getSequelizeInstance() {
       sequelize = new Sequelize('postgres', 'postgres.uqohgtgpqijblzljdaxl', 'tidywash-prod', {
         host: 'aws-0-ap-south-1.pooler.supabase.com',
         dialect: 'postgres',
-        models: [User, Employee, Customer],
+        models: [User, Employee, Customer, Address],
       });
 
     }
