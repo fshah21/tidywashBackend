@@ -8,6 +8,8 @@ import { User } from "./models/user.model";
 import { runWith } from "firebase-functions";
 import { Employee } from "./models/employee.model";
 import { Customer } from "./models/customer.model";
+import dns from 'dns';
+dns.setDefaultResultOrder('ipv4first');
 
 const app = express();
 const runtimeOpts = {
