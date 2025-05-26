@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: userservice
+    env: node
+    plan: free
+    repo: https://github.com/fshah21/tidywashBackend
+    rootDir: userservice
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    autoDeploy: true
+
+  - type: web
+    name: orderservice
+    env: node
+    plan: free
+    repo: https://github.com/fshah21/tidywashBackend
+    rootDir: orderservice
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    autoDeploy: true
