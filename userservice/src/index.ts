@@ -29,14 +29,9 @@ let sequelize: Sequelize;
 // Initialize the database connection
 function getSequelizeInstance() {
     if (!sequelize) {
-      sequelize = new Sequelize("postgresql://postgres:tidywash-prod@db.uqohgtgpqijblzljdaxl.supabase.co:5432/postgres?sslmode=require", {
-        dialect: "postgres",
-        dialectOptions: {
-          ssl: {
-            require: true,
-            rejectUnauthorized: false,
-          },
-        },
+      sequelize = new Sequelize('postgres', 'postgres', 'postgres.uqohgtgpqijblzljdaxl', {
+        host: 'aws-0-ap-south-1.pooler.supabase.com',
+        dialect: 'postgres' 
       });
 
     }
