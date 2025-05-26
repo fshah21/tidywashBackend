@@ -2,14 +2,14 @@
 import express from "express";
 import { json } from "body-parser";
 import cors from "cors";
-import { Sequelize, SequelizeOptions } from "sequelize-typescript";
+import { Sequelize } from "sequelize-typescript";
 import { runWith } from "firebase-functions";
 import { orderRoutes } from "./routes/order.routes";
 import { cartRoutes } from "./routes/cart.routes";
 import { pricingRoutes } from "./routes/pricing.routes";
-import { Pricing } from "./models/pricing.model";
-import { CartItem } from "./models/cartItem.model";
-import { Cart } from "./models/cart.model";
+// import { Pricing } from "./models/pricing.model";
+// import { CartItem } from "./models/cartItem.model";
+// import { Cart } from "./models/cart.model";
 
 const app = express();
 const runtimeOpts = {
@@ -31,26 +31,10 @@ let sequelize: Sequelize;
 // Initialize the database connection
 function getSequelizeInstance() {
     if (!sequelize) {
-      const sequelizeOptions: SequelizeOptions = {
-        database: "postgres",
-        username: "postgres",
-        password: "tidywash-prod",
-        host: "/cloudsql/silent-bolt-456117-r7:asia-south1:tidywash-production-final-standard",
-        dialect: "postgres",
-        models: [Pricing, CartItem, Cart],
-        pool: {
-          max: 10,
-          min: 0,
-          acquire: 30000,
-          idle: 10000,
-        },
-        dialectOptions: {
-          socketPath: '/cloudsql/silent-bolt-456117-r7:asia-south1:tidywash-production-final-standard',
-        },
-      };
-  
-    sequelize = new Sequelize(sequelizeOptions);
-
+      sequelize = new Sequelize('postgres', 'postgres.uqohgtgpqijblzljdaxl', 'tidywash-prod', {
+        host: 'aws-0-ap-south-1.pooler.supabase.com',
+        dialect: 'postgres' 
+      });
     }
     
     return sequelize;
