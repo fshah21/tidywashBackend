@@ -5,6 +5,7 @@ import cors from "cors";
 import { Sequelize, SequelizeOptions } from "sequelize-typescript";
 import { runWith } from "firebase-functions";
 import { orderRoutes } from "./routes/order.routes";
+import { cartRoutes } from "./routes/cart.routes";
 import { pricingRoutes } from "./routes/pricing.routes";
 import { Pricing } from "./models/pricing.model";
 import { CartItem } from "./models/cartItem.model";
@@ -19,6 +20,7 @@ const runtimeOpts = {
 // // Apply middleware
 app.use(json());
 app.use("/api", orderRoutes);
+app.use("/api", cartRoutes);
 app.use("/api/pricing", pricingRoutes);
 
 // CORS configuration
