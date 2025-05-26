@@ -7,9 +7,9 @@ import { runWith } from "firebase-functions";
 import { orderRoutes } from "./routes/order.routes";
 import { cartRoutes } from "./routes/cart.routes";
 import { pricingRoutes } from "./routes/pricing.routes";
-// import { Pricing } from "./models/pricing.model";
-// import { CartItem } from "./models/cartItem.model";
-// import { Cart } from "./models/cart.model";
+import { Pricing } from "./models/pricing.model";
+import { CartItem } from "./models/cartItem.model";
+import { Cart } from "./models/cart.model";
 
 const app = express();
 const runtimeOpts = {
@@ -43,7 +43,8 @@ function getSequelizeInstance() {
     if (!sequelize) {
       sequelize = new Sequelize('postgres', 'postgres.uqohgtgpqijblzljdaxl', 'tidywash-prod', {
         host: 'aws-0-ap-south-1.pooler.supabase.com',
-        dialect: 'postgres' 
+        dialect: 'postgres',
+        models: [Pricing, Cart, CartItem],
       });
     }
     

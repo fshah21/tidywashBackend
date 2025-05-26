@@ -4,10 +4,10 @@ import { json } from "body-parser";
 import cors from "cors";
 import { userRoutes } from "./routes/user.routes";
 import { Sequelize } from "sequelize-typescript";
-// import { User } from "./models/user.model";
+import { User } from "./models/user.model";
 import { runWith } from "firebase-functions";
-// import { Employee } from "./models/employee.model";
-// import { Customer } from "./models/customer.model";
+import { Employee } from "./models/employee.model";
+import { Customer } from "./models/customer.model";
 import dns from 'dns';
 dns.setDefaultResultOrder('ipv4first');
 
@@ -42,7 +42,8 @@ function getSequelizeInstance() {
     if (!sequelize) {
       sequelize = new Sequelize('postgres', 'postgres.uqohgtgpqijblzljdaxl', 'tidywash-prod', {
         host: 'aws-0-ap-south-1.pooler.supabase.com',
-        dialect: 'postgres' 
+        dialect: 'postgres',
+        models: [User, Employee, Customer],
       });
 
     }
