@@ -29,7 +29,7 @@ let sequelize: Sequelize;
 // Initialize the database connection
 function getSequelizeInstance() {
     if (!sequelize) {
-      sequelize = new Sequelize('postgres', 'postgres', 'postgres.uqohgtgpqijblzljdaxl', {
+      sequelize = new Sequelize('postgres', 'postgres.uqohgtgpqijblzljdaxl', 'tidywash-prod', {
         host: 'aws-0-ap-south-1.pooler.supabase.com',
         dialect: 'postgres' 
       });
