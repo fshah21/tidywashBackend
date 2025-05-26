@@ -31,7 +31,8 @@ function getSequelizeInstance() {
         database: "postgres",
         username: "postgres",
         password: "tidywash-prod",
-        host: "/cloudsql/silent-bolt-456117-r7:asia-south1:tidywash-production-final-standard",
+        host: "db.uqohgtgpqijblzljdaxl.supabase.co",
+        port: 5432,
         dialect: "postgres",
         models: [User, Employee, Customer],
         pool: {
@@ -41,7 +42,10 @@ function getSequelizeInstance() {
           idle: 10000,
         },
         dialectOptions: {
-          socketPath: '/cloudsql/silent-bolt-456117-r7:asia-south1:tidywash-production-final-standard',
+          ssl: {
+            require: true,
+            rejectUnauthorized: false, // Supabase requires SSL
+          },
         },
       };
   
