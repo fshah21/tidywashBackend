@@ -1,0 +1,91 @@
+import {
+    Table,
+    Model,
+    Column,
+    PrimaryKey,
+    CreatedAt,
+    UpdatedAt,
+    DataType,
+  } from "sequelize-typescript";
+  
+import { UUID } from "crypto";
+
+export enum OrderStatus {
+    ACTIVE = "active",
+    CONVERTED = "converted",
+}
+
+export enum TimeSlot {
+    MORNING = "morning",
+    NOON = "noon",
+    EVENING = "evening",
+    NIGHT = "night",
+}
+  
+@Table({ tableName: "orders" })
+export class Order extends Model {
+    @PrimaryKey
+    @Column({
+        type: DataType.UUID,
+        defaultValue: DataType.UUIDV4,
+    })
+    id: UUID;
+
+    @Column({
+        type: DataType.UUID,
+        allowNull: false,
+    })
+    customer_id: UUID;
+
+    @Column({
+        type: DataType.UUID,
+        allowNull: false,
+    })
+    cart_id: UUID;
+
+    @Column({
+        type: DataType.UUID,
+        allowNull: true,
+    })
+    address_id: UUID;
+
+    @Column({
+        type: DataType.ENUM(...Object.values(OrderStatus)),
+        allowNull: false,
+        defaultValue: OrderStatus.ACTIVE,
+    })
+    status: OrderStatus;
+
+    @Column({
+        type: DataType.DATE,
+        allowNull: true,
+    })
+    pickup_date: Date;
+    
+    @Column({
+        type: DataType.DATE,
+        allowNull: true,
+    })
+    delivery_date: Date;
+
+    @Column({
+        type: DataType.ENUM(...Object.values(TimeSlot)),
+        allowNull: true,
+    })
+    pickup_slot: TimeSlot;
+
+    @Column({
+        type: DataType.ENUM(...Object.values(TimeSlot)),
+        allowNull: true,
+    })
+    delivery_slot: TimeSlot;
+
+    @CreatedAt
+    @Column({ type: DataType.DATE, allowNull: false })
+    created_date: Date;
+
+    @UpdatedAt
+    @Column({ type: DataType.DATE, allowNull: false })
+    modified_date: Date;
+}
+  

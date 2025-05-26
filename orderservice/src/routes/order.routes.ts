@@ -4,3 +4,4 @@ import { OrderController } from "../controllers/order.controller";
 export const orderRoutes = Router();
 
 orderRoutes.get("/healthCheck", OrderController.healthCheck);
+orderRoutes.post("/orders", OrderController.createOrder);
