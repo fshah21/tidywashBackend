@@ -3,11 +3,11 @@ import express from "express";
 import { json } from "body-parser";
 import cors from "cors";
 import { userRoutes } from "./routes/user.routes";
-import { Sequelize, SequelizeOptions } from "sequelize-typescript";
-import { User } from "./models/user.model";
+import { Sequelize } from "sequelize-typescript";
+// import { User } from "./models/user.model";
 import { runWith } from "firebase-functions";
-import { Employee } from "./models/employee.model";
-import { Customer } from "./models/customer.model";
+// import { Employee } from "./models/employee.model";
+// import { Customer } from "./models/customer.model";
 import dns from 'dns';
 dns.setDefaultResultOrder('ipv4first');
 
@@ -29,29 +29,15 @@ let sequelize: Sequelize;
 // Initialize the database connection
 function getSequelizeInstance() {
     if (!sequelize) {
-      const sequelizeOptions: SequelizeOptions = {
-        database: "postgres",
-        username: "postgres",
-        password: "tidywash-prod",
-        host: "db.uqohgtgpqijblzljdaxl.supabase.co",
-        port: 5432,
+      sequelize = new Sequelize("postgresql://postgres:tidywash-prod@db.uqohgtgpqijblzljdaxl.supabase.co:5432/postgres?sslmode=require", {
         dialect: "postgres",
-        models: [User, Employee, Customer],
-        pool: {
-          max: 10,
-          min: 0,
-          acquire: 30000,
-          idle: 10000,
-        },
         dialectOptions: {
           ssl: {
             require: true,
-            rejectUnauthorized: false, // Supabase requires SSL
+            rejectUnauthorized: false,
           },
         },
-      };
-  
-    sequelize = new Sequelize(sequelizeOptions);
+      });
 
     }
     
