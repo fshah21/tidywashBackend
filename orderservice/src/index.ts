@@ -10,6 +10,7 @@ import { pricingRoutes } from "./routes/pricing.routes";
 import { Pricing } from "./models/pricing.model";
 import { CartItem } from "./models/cartItem.model";
 import { Cart } from "./models/cart.model";
+import { Order } from "./models/order.model";
 
 const app = express();
 const runtimeOpts = {
@@ -44,7 +45,7 @@ function getSequelizeInstance() {
       sequelize = new Sequelize('postgres', 'postgres.uqohgtgpqijblzljdaxl', 'tidywash-prod', {
         host: 'aws-0-ap-south-1.pooler.supabase.com',
         dialect: 'postgres',
-        models: [Pricing, Cart, CartItem],
+        models: [Pricing, Cart, CartItem, Order],
       });
     }
     
