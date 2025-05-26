@@ -9,6 +9,7 @@ import { runWith } from "firebase-functions";
 import { Employee } from "./models/employee.model";
 import { Customer } from "./models/customer.model";
 import dns from 'dns';
+import { customerRoutes } from "./routes/customer.routes";
 dns.setDefaultResultOrder('ipv4first');
 
 const app = express();
@@ -24,6 +25,7 @@ app.use(json());
 app.use(cors({ origin: true }));
 
 app.use("/api", userRoutes);
+app.use("/api", customerRoutes);
 
 const PORT = process.env.PORT || 3000;
 
