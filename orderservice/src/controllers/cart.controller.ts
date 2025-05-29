@@ -55,24 +55,49 @@ export class CartController {
         total_price,
       });
     }
-    console.log("CART ITMES CREATED");
+      console.log("CART ITMES CREATED");
 
-    // 3. Update cart total_amount
-    cart.total_amount = totalAmount;
-    await cart.save();
+      // 3. Update cart total_amount
+      cart.total_amount = totalAmount;
+      await cart.save();
 
-    console.log("CART IS UPDATED");
+      console.log("CART IS UPDATED");
 
-    // 4. Respond success with cart data
-    return res.status(201).json({
-      message: "Cart created successfully",
-      cart_id: cart.id,
-      total_amount: totalAmount,
-      status: cart.status,
-    });
-  } catch (error) {
-    console.error("Error creating cart:", error);
-    return res.status(500).json({ error: "Internal server error" });
+      // 4. Respond success with cart data
+      return res.status(201).json({
+        message: "Cart created successfully",
+        cart_id: cart.id,
+        total_amount: totalAmount,
+        status: cart.status,
+      });
+    } catch (error) {
+      console.error("Error creating cart:", error);
+      return res.status(500).json({ error: "Internal server error" });
+    }
   }
-}
+
+  static async getActiveCartsByCustomerId(req: Request, res: Response) {
+    try {
+      const { customer_id } = req.params;
+
+      const carts = await Cart.findAll({
+        where: {
+          customer_id: customer_id,
+          status: "active"
+        }
+      });
+      if (!carts) {
+        return res.status(404).json({ message: "No active carts for this customer" });
+      }
+
+      return res.status(200).json({
+        message: "Carts found successfully",
+        carts: carts
+      });
+    } catch (error) {
+      console.error("Error getting active carts by customer id:", error);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  }
+
 }

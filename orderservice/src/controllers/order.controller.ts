@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { OrderStatus } from "../models/order.model";
 import { Order } from "../models/order.model";
+import { Cart } from "../models/cart.model";
 
 export class OrderController {
     static async healthCheck(_req: Request, res: Response) {
@@ -20,6 +21,13 @@ export class OrderController {
         if (!cart_id || !customer_id || !address_id) {
           return res.status(400).json({ message: "Missing required fields." });
         }
+
+        await Cart.update(
+          { status: "converted" },           // Fields to update
+          {
+            where: { id: cart_id }      // Condition to find the correct cart
+          }
+        );
   
         const order = await Order.create({
           cart_id,
