@@ -39,6 +39,12 @@ export class Order extends Model {
 
     @Column({
         type: DataType.UUID,
+        allowNull: true,
+    })
+    employee_id: UUID;
+
+    @Column({
+        type: DataType.UUID,
         allowNull: false,
     })
     cart_id: UUID;
