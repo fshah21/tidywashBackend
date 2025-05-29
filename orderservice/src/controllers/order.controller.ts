@@ -128,7 +128,49 @@ export class OrderController {
           order
         });
       } catch (error) {
-        console.error("Error updating pickup/delivery slots:", error);
+        console.error("Error updating order status:", error);
+        return res.status(500).json({ message: "Internal server error" });
+      }
+    }
+
+    static async getActiveOrdersByCustomerId(req: Request, res: Response) {
+      try {
+        const { customer_id } = req.params;
+    
+        const orders = await Order.findAll({
+          where: {
+            customer_id: customer_id
+          }
+        });
+        if (!orders) {
+          return res.status(404).json({ message: "No active orders for this customer" });
+        }
+
+        return res.status(200).json({
+          message: "Orders found successfully",
+          orders: orders
+        });
+      } catch (error) {
+        console.error("Error getting active orders by customer id:", error);
+        return res.status(500).json({ message: "Internal server error" });
+      }
+    }
+
+    static async getOrderDetails(req: Request, res: Response) {
+      try {
+        const { order_id } = req.params;
+    
+        const order = await Order.findByPk(order_id);
+        if (!order) {
+          return res.status(404).json({ message: "No active orders for this customer" });
+        }
+
+        return res.status(200).json({
+          message: "Orders found successfully",
+          order: order
+        });
+      } catch (error) {
+        console.error("Error getting active orders by customer id:", error);
         return res.status(500).json({ message: "Internal server error" });
       }
     }
