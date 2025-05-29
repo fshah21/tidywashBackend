@@ -76,23 +76,31 @@ export class CartController {
     }
   }
 
-  static async getActiveCartsByCustomerId(req: Request, res: Response) {
+  static async getActiveCartByCustomerId(req: Request, res: Response) {
     try {
       const { customer_id } = req.params;
 
-      const carts = await Cart.findAll({
+      const cart = await Cart.findOne({
         where: {
           customer_id: customer_id,
           status: "active"
-        }
+        },
+        order: [['created_date', 'DESC']],
       });
-      if (!carts) {
+      if (!cart) {
         return res.status(404).json({ message: "No active carts for this customer" });
       }
 
+      const cartItems = await CartItem.findAll({
+        where: {
+          cart_id: cart.id
+        }
+      })
+
       return res.status(200).json({
-        message: "Carts found successfully",
-        carts: carts
+        message: "Cart found successfully",
+        cart: cart,
+        cart_items: cartItems
       });
     } catch (error) {
       console.error("Error getting active carts by customer id:", error);
