@@ -102,4 +102,34 @@ export class OrderController {
         return res.status(500).json({ message: "Internal server error" });
       }
     }
+
+    static async updateOrderStatus(req: Request, res: Response) {
+      try {
+        const { order_id } = req.params;
+        const { status } = req.body;
+    
+        // Validate required data (optional: add stricter validation as needed)
+        if (!status) {
+          return res.status(400).json({ message: "Employee id is blank" });
+        }
+    
+        const order = await Order.findByPk(order_id);
+        if (!order) {
+          return res.status(404).json({ message: "Order not found" });
+        }
+    
+        // Update only provided fields
+        if (status) order.status = status;
+      
+        await order.save();
+    
+        return res.status(200).json({
+          message: "Order status updated successfully",
+          order
+        });
+      } catch (error) {
+        console.error("Error updating pickup/delivery slots:", error);
+        return res.status(500).json({ message: "Internal server error" });
+      }
+    }
 }

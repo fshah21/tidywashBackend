@@ -12,7 +12,7 @@ import { UUID } from "crypto";
 
 export enum OrderStatus {
     ACTIVE = "active",
-    CONVERTED = "converted",
+    PAID = "paid",
 }
 
 export enum TimeSlot {
