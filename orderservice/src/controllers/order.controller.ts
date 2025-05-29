@@ -159,11 +159,13 @@ export class OrderController {
     static async getOrderDetails(req: Request, res: Response) {
       try {
         const { order_id } = req.params;
+        console.log("GET ORDER DETAILS", order_id);
     
         const order = await Order.findByPk(order_id);
         if (!order) {
           return res.status(404).json({ message: "No active orders for this customer" });
         }
+        console.log("ORDER", order);
 
         return res.status(200).json({
           message: "Orders found successfully",
