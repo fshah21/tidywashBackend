@@ -57,9 +57,9 @@ export class OrderController {
     
         // Update only provided fields
         if (pickup_date) order.pickup_date = new Date(pickup_date);
-        if (pickup_slot) order.pickup_slot = pickup_slot;
+        if (pickup_slot) order.pickup_slot = pickup_slot.toLowerCase();
         if (delivery_date) order.delivery_date = new Date(delivery_date);
-        if (delivery_slot) order.delivery_slot = delivery_slot;
+        if (delivery_slot) order.delivery_slot = delivery_slot.toLowerCase();
     
         await order.save();
     
