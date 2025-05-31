@@ -184,4 +184,8 @@ export class OrderController {
         return res.status(500).json({ message: "Internal server error" });
       }
     }
+
+    static async getAllPaidOrders(req: Request, res: Response) {
+      
+    }
 }

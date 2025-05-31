@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { User } from "../models/user.model";
 import { Employee } from "../models/employee.model";
 import { Customer } from "../models/customer.model";
+import { Admin } from "../models/admin.model";
 
 export class UserController {
   static async createEmployee(req: Request, res: Response) {
@@ -227,4 +228,23 @@ export class UserController {
       });
   }
   }
+
+  static async loginAsAdmin(req: Request, res: Response) {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+        return res.status(400).json({ message: "Email and password are required." });
+      }
+  
+      const admin = await Admin.findOne({ where: { email } });
+  
+      if (!admin) {
+        return res.status(400).json({ message: "Invalid credentials." });
+      }
+  
+      // Exclude password from response
+      const { password: _, ...adminData } = admin.get({ plain: true });
+  
+      return res.status(200).json({ admin: adminData });
+    }
 }

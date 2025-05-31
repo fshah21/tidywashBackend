@@ -11,6 +11,7 @@ import { Customer } from "./models/customer.model";
 import { Address } from "./models/address.model";
 import dns from 'dns';
 import { customerRoutes } from "./routes/customer.routes";
+import { Admin } from "./models/admin.model";
 dns.setDefaultResultOrder('ipv4first');
 
 const app = express();
@@ -46,7 +47,7 @@ function getSequelizeInstance() {
       sequelize = new Sequelize('postgres', 'postgres.uqohgtgpqijblzljdaxl', 'tidywash-prod', {
         host: 'aws-0-ap-south-1.pooler.supabase.com',
         dialect: 'postgres',
-        models: [User, Employee, Customer, Address],
+        models: [User, Employee, Customer, Address, Admin],
       });
 
     }
