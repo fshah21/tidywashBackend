@@ -84,10 +84,10 @@ export class OrderController {
     static async assignToEmployee(req: Request, res: Response) {
       try {
         const { order_id } = req.params;
-        const { employee_id } = req.body;
+        const { pickup_employee_id, delivery_employee_id } = req.body;
     
         // Validate required data (optional: add stricter validation as needed)
-        if (!employee_id) {
+        if (!pickup_employee_id && !delivery_employee_id)  {
           return res.status(400).json({ message: "Employee id is blank" });
         }
     
@@ -97,7 +97,8 @@ export class OrderController {
         }
     
         // Update only provided fields
-        if (employee_id) order.employee_id = employee_id;
+        if (pickup_employee_id) order.pickup_employee_id = pickup_employee_id;
+        if (delivery_employee_id) order.delivery_employee_id = delivery_employee_id;
       
         await order.save();
     
@@ -183,9 +184,5 @@ export class OrderController {
         console.error("Error getting active orders by customer id:", error);
         return res.status(500).json({ message: "Internal server error" });
       }
-    }
-
-    static async getAllPaidOrders(req: Request, res: Response) {
-      
     }
 }

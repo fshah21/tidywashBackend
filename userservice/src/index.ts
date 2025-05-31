@@ -12,6 +12,7 @@ import { Address } from "./models/address.model";
 import dns from 'dns';
 import { customerRoutes } from "./routes/customer.routes";
 import { Admin } from "./models/admin.model";
+import { employeeRoutes } from "./routes/employee.routes";
 dns.setDefaultResultOrder('ipv4first');
 
 const app = express();
@@ -28,6 +29,7 @@ app.use(cors({ origin: true }));
 
 app.use("/api", userRoutes);
 app.use("/api", customerRoutes);
+app.use("/api", employeeRoutes);
 
 const PORT = process.env.PORT || 3000;
 
