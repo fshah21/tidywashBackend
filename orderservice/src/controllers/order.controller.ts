@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { OrderStatus } from "../models/order.model";
 import { Order } from "../models/order.model";
 import { Cart } from "../models/cart.model";
+import { Op } from 'sequelize';
 
 export class OrderController {
     static async healthCheck(_req: Request, res: Response) {
@@ -183,6 +184,22 @@ export class OrderController {
       } catch (error) {
         console.error("Error getting active orders by customer id:", error);
         return res.status(500).json({ message: "Internal server error" });
+      }
+    }
+
+    static async getAllOrders(_req: Request, res: Response) {
+      try {
+        const orders = await Order.findAll({
+          where: {
+            status: {
+              [Op.ne]: "completed"
+            }
+          }
+        });
+    
+        res.status(200).json(orders);
+      } catch (error) {
+        res.status(500).json({ message: "Error fetching orders", error });
       }
     }
 }

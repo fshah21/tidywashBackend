@@ -13,6 +13,10 @@ import { UUID } from "crypto";
 export enum OrderStatus {
     ACTIVE = "active",
     PAID = "paid",
+    ASSIGNED = "assigned",
+    PICKUP_COMPLETED = "pickup_completed",
+    DELIVERY_COMPLETED = "delivery_completed",
+    COMPLETED = "completed"
 }
 
 export enum TimeSlot {

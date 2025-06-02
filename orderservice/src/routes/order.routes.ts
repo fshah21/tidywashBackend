@@ -10,3 +10,4 @@ orderRoutes.patch("/orders/:order_id/assignToEmployee", OrderController.assignTo
 orderRoutes.patch("/orders/:order_id/updateOrderStatus", OrderController.updateOrderStatus);
 orderRoutes.get("/orders/getActiveOrdersByCustomerId/:customer_id", OrderController.getActiveOrdersByCustomerId);
 orderRoutes.get("/orders/getOrderDetails/:order_id", OrderController.getOrderDetails);
+orderRoutes.get("/orders/getAllOrders", OrderController.getAllOrders);
