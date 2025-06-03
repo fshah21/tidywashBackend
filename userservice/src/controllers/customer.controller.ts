@@ -63,7 +63,7 @@ export class CustomerController {
     }
 
     static async getCustomerById(req: Request, res: Response) {
-      const customerId = req.params.id;
+      const customerId = req.params.customer_id;
       console.log("GET CUSTOMER BY ID", customerId);
         try {
           const customer = await Customer.findByPk(customerId, {
