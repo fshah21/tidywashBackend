@@ -193,7 +193,7 @@ export class OrderController {
         const orders = await Order.findAll({
           where: {
             status: {
-              [Op.ne]: "completed"
+              [Op.ne]: ["completed", "active"]
             }
           }
         });
