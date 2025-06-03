@@ -18,14 +18,15 @@ const runtimeOpts = {
   memory: "512MB" as "512MB",
 };
 
+// CORS configuration
+app.use(cors({ origin: true }));
+
 // // Apply middleware
 app.use(json());
 app.use("/api", orderRoutes);
 app.use("/api", cartRoutes);
 app.use("/api/pricing", pricingRoutes);
 
-// CORS configuration
-app.use(cors({ origin: true }));
 
 const PORT = process.env.PORT || 3000;
 
