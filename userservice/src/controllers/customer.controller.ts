@@ -64,6 +64,7 @@ export class CustomerController {
 
     static async getCustomerById(req: Request, res: Response) {
       const customerId = req.params.id;
+      console.log("GET CUSTOMER BY ID", customerId);
         try {
           const customer = await Customer.findByPk(customerId, {
             include: [
@@ -72,6 +73,8 @@ export class CustomerController {
               },
             ],
           });
+
+          console.log("CUSTOMER", customer);
 
           if (!customer) {
             return res.status(404).json({ message: "Customer not found" });
