@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import { Address } from "../models/address.model";
+import { Customer } from "../models/customer.model";
+import { User } from "../models/user.model";
 
 export class CustomerController {
     static async getAddressesForCustomer(req: Request, res: Response) {
@@ -58,5 +60,27 @@ export class CustomerController {
             console.error("Error adding address:", error);
             return res.status(500).json({ message: "Internal server error", error });
           }
+    }
+
+    static async getCustomerById(req: Request, res: Response) {
+      const customerId = req.params.id;
+        try {
+          const customer = await Customer.findByPk(customerId, {
+            include: [
+              {
+                model: User
+              },
+            ],
+          });
+
+          if (!customer) {
+            return res.status(404).json({ message: "Customer not found" });
+          }
+
+          return res.status(200).json(customer);
+        } catch (error) {
+          console.error("Error fetching customer:", error);
+          return res.status(500).json({ message: "Error fetching customer", error });
+        }
     }
 }
