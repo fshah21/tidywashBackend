@@ -3,6 +3,7 @@ import { OrderStatus } from "../models/order.model";
 import { Order } from "../models/order.model";
 import { Cart } from "../models/cart.model";
 import { Op } from 'sequelize';
+import axios from "axios";
 
 export class OrderController {
     static async healthCheck(_req: Request, res: Response) {
@@ -196,8 +197,31 @@ export class OrderController {
             }
           }
         });
+
+        const customerIds = [...new Set(orders.map(order => order.customer_id))];
+
+        const customerResponses = await Promise.all(
+          customerIds.map(id =>
+            axios.get(`https://tidywashbackend.onrender.com/api/getCustomerById/${id}`)
+              .then(res => ({ id, data: res.data }))
+              .catch(err => ({ id, error: err.message }))
+          )
+        );
+
+        const customerMap = new Map<string, any>();
+        for (const res of customerResponses) {
+          if ('data' in res) {
+            customerMap.set(res.id, res.data);
+          }
+        }
+
+        // 5. Attach customer + user data to each order
+        const enrichedOrders = orders.map(order => ({
+          ...order.toJSON(),
+          customer: customerMap.get(order.customer_id) || null,
+        }));
     
-        res.status(200).json(orders);
+        res.status(200).json(enrichedOrders);
       } catch (error) {
         res.status(500).json({ message: "Error fetching orders", error });
       }
