@@ -195,7 +195,8 @@ export class OrderController {
             status: {
               [Op.notIn]: ["completed", "active"]
             }
-          }
+          },
+          order: [["created_date", "DESC"]]
         });
 
         const customerIds = [...new Set(orders.map(order => order.customer_id))];
