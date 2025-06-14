@@ -30,12 +30,15 @@ export class OrderController {
             where: { id: cart_id }      // Condition to find the correct cart
           }
         );
+
+        const randomRefId = `TW-${Math.floor(100000 + Math.random() * 900000)}`;
   
         const order = await Order.create({
           cart_id,
           customer_id,
           address_id,
           status: OrderStatus.ACTIVE,
+          ref_order_id: randomRefId
         });
   
         return res.status(201).json({ message: "Order created", order });
