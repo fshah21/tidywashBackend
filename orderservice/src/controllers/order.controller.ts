@@ -151,7 +151,8 @@ export class OrderController {
         const orders = await Order.findAll({
           where: {
             customer_id: customer_id
-          }
+          },
+          order: [['created_date', 'DESC']]  // 🔥 Sort by created_date descending
         });
         if (!orders) {
           return res.status(404).json({ message: "No active orders for this customer" });
