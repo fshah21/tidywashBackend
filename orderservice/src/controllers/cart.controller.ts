@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { Cart, CartStatus } from "../models/cart.model";
 import { CartItem } from "../models/cartItem.model";
+import { Pricing } from "../models/pricing.model";
 
 interface CartItemInput {
   quantity: number;
@@ -114,7 +115,12 @@ export class CartController {
     const cartItems = await CartItem.findAll({
       where: {
         cart_id: cart_id
-      }
+      },
+      include: [
+        {
+          model: Pricing
+        }
+      ]
     })
     console.log("CART ITEMS", cartItems);
 
