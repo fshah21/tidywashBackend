@@ -6,6 +6,7 @@ import {
     CreatedAt,
     UpdatedAt,
     DataType,
+    BeforeCreate
   } from "sequelize-typescript";
   
 import { UUID } from "crypto";
@@ -40,6 +41,12 @@ export class Order extends Model {
         allowNull: false,
     })
     customer_id: UUID;
+
+    @Column({
+        type: DataType.STRING,
+        allowNull: false,
+    })
+    ref_order_id: string;
 
     @Column({
         type: DataType.UUID,
@@ -95,6 +102,12 @@ export class Order extends Model {
         allowNull: true,
     })
     delivery_slot: TimeSlot;
+
+    @BeforeCreate
+    static generateRefOrderId(instance: Order) {
+        const randomSixDigit = Math.floor(100000 + Math.random() * 900000); // ensures 6-digit number
+        instance.ref_order_id = `TW-${randomSixDigit}`;
+    }
 
     @CreatedAt
     @Column({ type: DataType.DATE, allowNull: false })
