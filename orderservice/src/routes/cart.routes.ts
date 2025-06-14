@@ -5,3 +5,4 @@ export const cartRoutes = Router();
 
 cartRoutes.post("/carts", CartController.createCart);
 cartRoutes.get("/carts/getActiveCartByCustomerId/:customer_id", CartController.getActiveCartByCustomerId);
+cartRoutes.get("/carts/getCartDetails/:cart_id", CartController.getCartDetails);

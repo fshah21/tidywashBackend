@@ -108,4 +108,16 @@ export class CartController {
     }
   }
 
+  static async getCartDetails(req: Request, res: Response) {
+    const { cart_id } = req.params;
+    const cartItems = CartItem.findAll({
+      where: {
+        cart_id: cart_id
+      }
+    })
+
+    return res.status(200).json({
+      cart_items: cartItems
+    })
+  }
 }
