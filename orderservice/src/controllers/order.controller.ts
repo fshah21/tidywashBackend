@@ -258,7 +258,7 @@ export class OrderController {
     
         const orders = await Order.findAll({
           where: whereCondition,
-          order: [['updatedAt', 'DESC']]
+          order: [['modified_date', 'DESC']]
         });
     
         return res.status(200).json({
