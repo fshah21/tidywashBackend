@@ -241,10 +241,7 @@ export class OrderController {
           [Op.or]: [
             { pickup_employee_id: employee_id },
             { delivery_employee_id: employee_id }
-          ],
-          status: {
-            [Op.in]: ["COMPLETED", "CANCELLED"]
-          }
+          ]
         };
     
         // Filter by type
