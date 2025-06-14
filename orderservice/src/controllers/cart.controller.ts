@@ -111,7 +111,7 @@ export class CartController {
   static async getCartDetails(req: Request, res: Response) {
     const { cart_id } = req.params;
     console.log("GET CART DETAILS", cart_id);
-    const cartItems = CartItem.findAll({
+    const cartItems = await CartItem.findAll({
       where: {
         cart_id: cart_id
       }
