@@ -110,11 +110,13 @@ export class CartController {
 
   static async getCartDetails(req: Request, res: Response) {
     const { cart_id } = req.params;
+    console.log("GET CART DETAILS", cart_id);
     const cartItems = CartItem.findAll({
       where: {
         cart_id: cart_id
       }
     })
+    console.log("CART ITEMS", cartItems);
 
     return res.status(200).json({
       cart_items: cartItems
