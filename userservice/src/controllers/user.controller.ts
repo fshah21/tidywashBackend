@@ -23,6 +23,10 @@ export class UserController {
         return res.status(400).json({ message: "Phone number with country code is required" });
       }
 
+      if (!phone_number.country_code.startsWith('+')) {
+        phone_number.country_code = `+${phone_number.country_code}`;
+      }
+
       // Check if user with this phone number already exists
       const existingUser = await User.findOne({
           where: {
