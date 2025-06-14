@@ -231,4 +231,47 @@ export class OrderController {
         res.status(500).json({ message: "Error fetching orders", error });
       }
     }
+
+    static async getEmployeeOrderHistory(req: Request, res: Response) {
+      try {
+        const { employee_id } = req.params;
+        const { type = "all", status } = req.query;
+    
+        const whereCondition: any = {
+          [Op.or]: [
+            { pickup_employee_id: employee_id },
+            { delivery_employee_id: employee_id }
+          ],
+          status: {
+            [Op.in]: ["COMPLETED", "CANCELLED"]
+          }
+        };
+    
+        // Filter by type
+        if (type === "pickup") {
+          whereCondition.pickup_employee_id = employee_id;
+        } else if (type === "delivery") {
+          whereCondition.delivery_employee_id = employee_id;
+        }
+    
+        // Filter by status if provided
+        if (status) {
+          whereCondition.status = status.toString().toUpperCase();
+        }
+    
+        const orders = await Order.findAll({
+          where: whereCondition,
+          order: [['updatedAt', 'DESC']]
+        });
+    
+        return res.status(200).json({
+          message: "Employee order history fetched",
+          orders
+        });
+      } catch (error) {
+        console.error("Error fetching employee order history:", error);
+        return res.status(500).json({ message: "Internal server error" });
+      }
+    }
+    
 }

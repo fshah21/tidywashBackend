@@ -11,3 +11,4 @@ orderRoutes.patch("/orders/:order_id/updateOrderStatus", OrderController.updateO
 orderRoutes.get("/orders/getActiveOrdersByCustomerId/:customer_id", OrderController.getActiveOrdersByCustomerId);
 orderRoutes.get("/orders/getOrderDetails/:order_id", OrderController.getOrderDetails);
 orderRoutes.get("/orders/getAllOrders", OrderController.getAllOrders);
+orderRoutes.get("/orders/getEmployeeOrderHistory", OrderController.getEmployeeOrderHistory);
