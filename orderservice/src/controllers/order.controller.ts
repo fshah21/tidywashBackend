@@ -310,8 +310,14 @@ export class OrderController {
       }
     }
     
-    static async getAvailableOrdersToday(_req: Request, res: Response) {
+    static async getAvailableOrdersToday(req: Request, res: Response) {
       try {
+        const { employee_id } = req.query;
+    
+        if (!employee_id) {
+          return res.status(400).json({ message: "Missing employee_id" });
+        }
+    
         const todayStart = new Date();
         todayStart.setHours(0, 0, 0, 0);
     
@@ -322,24 +328,35 @@ export class OrderController {
           where: {
             [Op.or]: [
               {
-                pickup_date: {
-                  [Op.between]: [todayStart, todayEnd],
-                },
+                [Op.and]: [
+                  { pickup_date: { [Op.between]: [todayStart, todayEnd] } },
+                  { status: { [Op.notIn]: ["pickup_started", "delivery_started"] } },
+                ],
               },
               {
-                delivery_date: {
-                  [Op.between]: [todayStart, todayEnd],
-                },
+                [Op.and]: [
+                  { delivery_date: { [Op.between]: [todayStart, todayEnd] } },
+                  { status: { [Op.notIn]: ["pickup_started", "delivery_started"] } },
+                ],
+              },
+              {
+                [Op.and]: [
+                  { status: "pickup_started" },
+                  { pickup_employee_id: employee_id },
+                ],
+              },
+              {
+                [Op.and]: [
+                  { status: "delivery_started" },
+                  { delivery_employee_id: employee_id },
+                ],
               },
             ],
-            status: {
-              [Op.notIn]: [OrderStatus.PICKUP_STARTED, OrderStatus.DELIVERY_STARTED],
-            },
           },
           order: [["created_date", "DESC"]],
         });
     
-        // Initialize the response object
+        // Group by pickup or delivery slot
         const groupedBySlot: Record<TimeSlot, Order[]> = {
           morning: [],
           noon: [],
@@ -347,15 +364,22 @@ export class OrderController {
           night: [],
         };
     
-        // Group by pickup_slot or delivery_slot
         for (const order of orders) {
-          // Use pickup_slot if pickup_date is today, else use delivery_slot
           const isPickupToday =
-            order.pickup_date && order.pickup_date >= todayStart && order.pickup_date <= todayEnd;
-          const isDeliveryToday =
-            order.delivery_date && order.delivery_date >= todayStart && order.delivery_date <= todayEnd;
+            order.pickup_date &&
+            order.pickup_date >= todayStart &&
+            order.pickup_date <= todayEnd;
     
-          const slot = isPickupToday ? order.pickup_slot : isDeliveryToday ? order.delivery_slot : null;
+          const isDeliveryToday =
+            order.delivery_date &&
+            order.delivery_date >= todayStart &&
+            order.delivery_date <= todayEnd;
+    
+          const slot = isPickupToday
+            ? order.pickup_slot
+            : isDeliveryToday
+            ? order.delivery_slot
+            : null;
     
           if (slot && groupedBySlot[slot]) {
             groupedBySlot[slot].push(order);
@@ -364,10 +388,10 @@ export class OrderController {
     
         res.status(200).json(groupedBySlot);
       } catch (error) {
-        console.error("Error fetching today's unstarted orders:", error);
+        console.error("Error fetching today's available orders:", error);
         res.status(500).json({ message: "Internal server error" });
       }
-    }
+    }    
 
     static async startPickup(req: Request, res: Response) {
       const { order_id } = req.params;
