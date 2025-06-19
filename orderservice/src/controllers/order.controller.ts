@@ -436,10 +436,10 @@ export class OrderController {
     static async completePickup(req: Request, res: Response) {
       try {
         const { confirmation_id } = req.params;
-        const { otp, file_url } = req.body;
+        const { otp, file_url, type } = req.body;
         
-        if (!file_url || !otp) {
-          return res.status(400).json({ message: "No file uploaded or no otp" });
+        if (!file_url || !otp || !type) {
+          return res.status(400).json({ message: "Missing file, OTP or type" });
         }
     
         // 1. Check if confirmationId exists in the OrderConfirmation model
@@ -459,7 +459,21 @@ export class OrderController {
         orderConfirmation.file_url = file_url;
         await orderConfirmation.save();
     
-        // 5. Send success response
+        const order = await Order.findOne({ where: { id: orderConfirmation.order_id } });
+
+        if (!order) {
+          return res.status(404).json({ message: "Order not found" });
+        }
+
+        if (type === "pickup") {
+          order.status = OrderStatus.PICKUP_COMPLETED;
+        } else if (type === "delivery") {
+          order.status = OrderStatus.DELIVERY_COMPLETED;
+        } else {
+          return res.status(400).json({ message: "Invalid type" });
+        }
+
+        await order.save();
         return res.status(200).json({ message: "Pickup completed successfully", file_url });
       } catch (error) {
         console.error("Error completing pickup:", error);
