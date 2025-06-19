@@ -1,8 +1,5 @@
 import { Router } from "express";
 import { OrderController } from "../controllers/order.controller";
-import multer from 'multer';
-
-const upload = multer({ dest: 'uploads/' }); // or use storage engine if needed
 
 export const orderRoutes = Router();
 
@@ -19,8 +16,4 @@ orderRoutes.post("/orders/generateOTP/:order_id", OrderController.generateOrderO
 orderRoutes.get("/orders/getAvailableOrdersToday", OrderController.getAvailableOrdersToday);
 orderRoutes.put("/orders/startPickup/:order_id", OrderController.startPickup);
 orderRoutes.put("/orders/startDelivery/:order_id", OrderController.startDelivery);
-orderRoutes.post(
-    "/orders/completePickup/:confirmation_id",
-    upload.single('file'), // ✅ parses `req.file`
-    OrderController.completePickup
-);
+orderRoutes.post("/orders/completePickup/:confirmation_id", OrderController.completePickup);

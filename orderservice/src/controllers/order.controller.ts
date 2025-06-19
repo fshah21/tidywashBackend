@@ -6,7 +6,6 @@ import { Op } from 'sequelize';
 import axios from "axios";
 import { OrderConfirmation } from "../models/orderConfirmation.model";
 import { TimeSlot } from "../models/order.model";
-import { supabase } from "../supabase";
 
 export class OrderController {
     static async healthCheck(_req: Request, res: Response) {
@@ -413,11 +412,10 @@ export class OrderController {
     static async completePickup(req: Request, res: Response) {
       try {
         const { confirmationId } = req.params;
-        const { otp } = req.body;
-        const file = req.files?.file; // Assuming you are using `multer` for file handling
+        const { otp, file_url } = req.body;
         
-        if (!file) {
-          return res.status(400).json({ message: "No file uploaded" });
+        if (!file_url || !otp) {
+          return res.status(400).json({ message: "No file uploaded or no otp" });
         }
     
         // 1. Check if confirmationId exists in the OrderConfirmation model
@@ -433,29 +431,12 @@ export class OrderController {
         if (orderConfirmation.otp !== otp) {
           return res.status(400).json({ message: "Invalid OTP" });
         }
-    
-        // 3. Upload file to Supabase
-        const { data, error } = await supabase
-          .storage
-          .from('orderconfirmations') // Specify the bucket name
-          .upload(`pickups/${confirmationId}_${file.name}`, file.data);
-    
-        if (error) {
-          return res.status(500).json({ message: "File upload failed", error });
-        }
-    
-        // 4. Store the file URL in the database
-        const fileUrl = data?.path
-        ? supabase.storage.from('your_bucket').getPublicUrl(data.path).data.publicUrl
-        : null;
-          
-        if (fileUrl) {
-          orderConfirmation.file_url = fileUrl;
-          await orderConfirmation.save();
-        }
+  
+        orderConfirmation.file_url = file_url;
+        await orderConfirmation.save();
     
         // 5. Send success response
-        return res.status(200).json({ message: "Pickup completed successfully", fileUrl });
+        return res.status(200).json({ message: "Pickup completed successfully", file_url });
       } catch (error) {
         console.error("Error completing pickup:", error);
         return res.status(500).json({ message: "Internal server error" });
