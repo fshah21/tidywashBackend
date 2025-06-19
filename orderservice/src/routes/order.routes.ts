@@ -14,3 +14,5 @@ orderRoutes.get("/orders/getAllOrders", OrderController.getAllOrders);
 orderRoutes.get("/orders/getEmployeeOrderHistory/:employee_id", OrderController.getEmployeeOrderHistory);
 orderRoutes.post("/orders/generateOTP/:order_id", OrderController.generateOrderOTP);
 orderRoutes.get("/orders/getAvailableOrdersToday", OrderController.getAvailableOrdersToday);
+orderRoutes.put("/orders/startPickup/:order_id", OrderController.startPickup);
+orderRoutes.put("/orders/startDelivery/:order_id", OrderController.startDelivery);

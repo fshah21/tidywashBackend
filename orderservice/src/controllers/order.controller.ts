@@ -369,4 +369,50 @@ export class OrderController {
         res.status(500).json({ message: "Internal server error" });
       }
     }
+
+    static async startPickup(req: Request, res: Response) {
+      const { order_id } = req.params;
+      const { employee_id } = req.body;
+
+      try {
+        const order = await Order.findByPk(order_id);
+        if (!order) return res.status(404).json({ message: "Order not found" });
+
+        await order.update({
+          status: OrderStatus.PICKUP_STARTED,
+          pickup_employee_id: employee_id,
+        });
+
+        return res.status(200).json({ message: "Pickup started", order });
+      } catch (error) {
+        console.error("Error starting pickup:", error);
+        return res.status(500).json({ message: "Internal server error" });
+      }
+    }
+
+    static async startDelivery(req: Request, res: Response) {
+      const { order_id } = req.params;
+      const { employee_id } = req.body;
+
+      try {
+        const order = await Order.findByPk(order_id);
+        if (!order) return res.status(404).json({ message: "Order not found" });
+
+        await order.update({
+          status: OrderStatus.DELIVERY_STARTED,
+          delivery_employee_id: employee_id,
+        });
+
+        return res.status(200).json({ message: "Delivery started", order });
+      } catch (error) {
+        console.error("Error starting delivery:", error);
+        return res.status(500).json({ message: "Internal server error" });
+      }
+    }
+
+    // static async completePickup(req: Request, res: Response) {
+    // }
+
+    // static async completeDelivery(req: Request, res: Response) {
+    // }
 }
