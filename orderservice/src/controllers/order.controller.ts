@@ -275,40 +275,39 @@ export class OrderController {
 
     static async generateOrderOTP(req: Request, res: Response) {
       const { order_id } = req.params;
-    const { type } = req.body; // Expecting: pickup or delivery
+      const { type } = req.body; // Expecting: pickup or delivery
 
-    if (!type || !["pickup", "delivery"].includes(type)) {
-      return res.status(400).json({ error: "Invalid or missing confirmation type." });
-    }
-2
-    try {
-      // Check if order exists
-      const order = await Order.findByPk(order_id);
-      if (!order) {
-        return res.status(404).json({ error: "Order not found" });
+      if (!type || !["pickup", "delivery"].includes(type)) {
+        return res.status(400).json({ error: "Invalid or missing confirmation type." });
       }
 
-      // Generate 6-digit OTP
-      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      try {
+        // Check if order exists
+        const order = await Order.findByPk(order_id);
+        if (!order) {
+          return res.status(404).json({ error: "Order not found" });
+        }
 
-      // Create or upsert confirmation
-      const confirmation = await OrderConfirmation.create({
-        order_id,
-        type,
-        otp,
-        file_url: null, // file will be uploaded later
-      });
+        // Generate 6-digit OTP
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-      // ✅ In production, you should send OTP via SMS or push notification
-      return res.status(200).json({
-        message: "OTP generated successfully",
-        otp, // ❗ Remove this in production!
-        confirmation_id: confirmation.id,
-      });
-    } catch (err) {
-      console.error("Error generating OTP:", err);
-      return res.status(500).json({ error: "Internal server error" });
-    }
+        // Create or upsert confirmation
+        const confirmation = await OrderConfirmation.create({
+          order_id,
+          type,
+          otp,
+          file_url: null, // file will be uploaded later
+        });
+
+        // ✅ In production, you should send OTP via SMS or push notification
+        return res.status(200).json({
+          message: "OTP generated successfully",
+          confirmation_id: confirmation.id,
+        });
+      } catch (err) {
+        console.error("Error generating OTP:", err);
+        return res.status(500).json({ error: "Internal server error" });
+      }
     }
     
     static async getAvailableOrdersToday(_req: Request, res: Response) {
