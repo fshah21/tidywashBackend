@@ -437,7 +437,7 @@ export class OrderController {
         // 3. Upload file to Supabase
         const { data, error } = await supabase
           .storage
-          .from('orderConfirmations') // Specify the bucket name
+          .from('orderconfirmations') // Specify the bucket name
           .upload(`pickups/${confirmationId}_${file.name}`, file.data);
     
         if (error) {
