@@ -326,30 +326,37 @@ export class OrderController {
     
         const orders = await Order.findAll({
           where: {
-            [Op.or]: [
+            [Op.and]: [
               {
-                [Op.and]: [
-                  { pickup_date: { [Op.between]: [todayStart, todayEnd] } },
-                  { status: { [Op.notIn]: ["pickup_started", "delivery_started"] } },
+                [Op.or]: [
+                  {
+                    [Op.and]: [
+                      { pickup_date: { [Op.between]: [todayStart, todayEnd] } },
+                      { status: { [Op.notIn]: ["pickup_started", "delivery_started"] } },
+                    ],
+                  },
+                  {
+                    [Op.and]: [
+                      { delivery_date: { [Op.between]: [todayStart, todayEnd] } },
+                      { status: { [Op.notIn]: ["pickup_started", "delivery_started"] } },
+                    ],
+                  },
+                  {
+                    [Op.and]: [
+                      { status: "pickup_started" },
+                      { pickup_employee_id: employee_id },
+                    ],
+                  },
+                  {
+                    [Op.and]: [
+                      { status: "delivery_started" },
+                      { delivery_employee_id: employee_id },
+                    ],
+                  },
                 ],
               },
               {
-                [Op.and]: [
-                  { delivery_date: { [Op.between]: [todayStart, todayEnd] } },
-                  { status: { [Op.notIn]: ["pickup_started", "delivery_started"] } },
-                ],
-              },
-              {
-                [Op.and]: [
-                  { status: "pickup_started" },
-                  { pickup_employee_id: employee_id },
-                ],
-              },
-              {
-                [Op.and]: [
-                  { status: "delivery_started" },
-                  { delivery_employee_id: employee_id },
-                ],
+                status: { [Op.not]: "delivery_completed" },
               },
             ],
           },
