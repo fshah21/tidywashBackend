@@ -160,6 +160,69 @@ export class UserController {
   }
   }
 
+  static async login(req: Request, res: Response) {
+    try {
+        const { phone_number, device_token } = req.body;
+    
+        if (!phone_number?.number || !phone_number?.country_code || !device_token) {
+          return res.status(400).json({ message: "Missing phone number or device token" });
+        }
+    
+        const formattedPhone = {
+          number: phone_number.number,
+          country_code: phone_number.country_code.startsWith("+")
+            ? phone_number.country_code
+            : `+${phone_number.country_code}`,
+        };
+    
+        // ✅ Find user by phone number
+        const user = await User.findOne({
+          where: {
+            phone_number: formattedPhone,
+          },
+        });
+    
+        if (!user) {
+          return res.status(404).json({ message: "User not found" });
+        }
+    
+        // ✅ Add device token if not already saved
+        const tokens = user.device_tokens || [];
+        if (!tokens.includes(device_token)) {
+          tokens.push(device_token);
+          user.device_tokens = tokens;
+          await user.save();
+        }
+    
+        // ✅ Fetch role-specific data
+        let customer = null;
+        let employee = null;
+    
+        if (user.role === "customer") {
+          customer = await Customer.findOne({ where: { user_id: user.id } });
+        } else if (user.role === "employee") {
+          employee = await Employee.findOne({ where: { user_id: user.id } });
+        }
+    
+        return res.status(200).json({
+          message: "Login successful",
+          user: {
+            id: user.id,
+            phone_number: user.phone_number,
+            first_name: user.first_name,
+            last_name: user.last_name,
+            role: user.role,
+            device_tokens: user.device_tokens,
+            customer,
+            employee,
+          },
+        });
+      } catch (error) {
+        console.error("Login failed", error);
+        return res.status(500).json({ message: "Login failed", error: error.message });
+      }
+  }
+
   static async loginAsAdmin(req: Request, res: Response) {
     const { email, password } = req.body;
 

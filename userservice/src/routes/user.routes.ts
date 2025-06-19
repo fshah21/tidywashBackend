@@ -5,4 +5,5 @@ export const userRoutes = Router();
 
 userRoutes.get("/healthCheck", UserController.healthCheck);
 userRoutes.post("/createUser", UserController.createUser);
+userRoutes.post("/login", UserController.login);
 userRoutes.post("/loginAsAdmin", UserController.loginAsAdmin);

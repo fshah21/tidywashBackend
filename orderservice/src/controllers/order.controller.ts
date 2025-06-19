@@ -435,7 +435,7 @@ export class OrderController {
 
     static async completePickup(req: Request, res: Response) {
       try {
-        const { confirmationId } = req.params;
+        const { confirmation_id } = req.params;
         const { otp, file_url } = req.body;
         
         if (!file_url || !otp) {
@@ -444,7 +444,7 @@ export class OrderController {
     
         // 1. Check if confirmationId exists in the OrderConfirmation model
         const orderConfirmation = await OrderConfirmation.findOne({
-          where: { confirmationId: confirmationId },
+          where: { confirmationId: confirmation_id },
         });
     
         if (!orderConfirmation) {
