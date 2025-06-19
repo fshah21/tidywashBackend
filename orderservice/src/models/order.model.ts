@@ -14,6 +14,8 @@ export enum OrderStatus {
     ACTIVE = "active",
     PAID = "paid",
     ASSIGNED = "assigned",
+    PICKUP_STARTED = "pickup_started",
+    DELIVERY_STARTED = "delivery_started",
     PICKUP_COMPLETED = "pickup_completed",
     DELIVERY_COMPLETED = "delivery_completed",
     COMPLETED = "completed"

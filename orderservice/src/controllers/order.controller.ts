@@ -4,6 +4,8 @@ import { Order } from "../models/order.model";
 import { Cart } from "../models/cart.model";
 import { Op } from 'sequelize';
 import axios from "axios";
+import { OrderConfirmation } from "../models/orderConfirmation.model";
+import { TimeSlot } from "../models/order.model";
 
 export class OrderController {
     static async healthCheck(_req: Request, res: Response) {
@@ -270,5 +272,101 @@ export class OrderController {
         return res.status(500).json({ message: "Internal server error" });
       }
     }
+
+    static async generateOrderOTP(req: Request, res: Response) {
+      const { order_id } = req.params;
+    const { type } = req.body; // Expecting: pickup or delivery
+
+    if (!type || !["pickup", "delivery"].includes(type)) {
+      return res.status(400).json({ error: "Invalid or missing confirmation type." });
+    }
+2
+    try {
+      // Check if order exists
+      const order = await Order.findByPk(order_id);
+      if (!order) {
+        return res.status(404).json({ error: "Order not found" });
+      }
+
+      // Generate 6-digit OTP
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+      // Create or upsert confirmation
+      const confirmation = await OrderConfirmation.create({
+        order_id,
+        type,
+        otp,
+        file_url: null, // file will be uploaded later
+      });
+
+      // ✅ In production, you should send OTP via SMS or push notification
+      return res.status(200).json({
+        message: "OTP generated successfully",
+        otp, // ❗ Remove this in production!
+        confirmation_id: confirmation.id,
+      });
+    } catch (err) {
+      console.error("Error generating OTP:", err);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+    }
     
+    static async getAvailableOrdersToday(_req: Request, res: Response) {
+      try {
+        const todayStart = new Date();
+        todayStart.setHours(0, 0, 0, 0);
+    
+        const todayEnd = new Date();
+        todayEnd.setHours(23, 59, 59, 999);
+    
+        const orders = await Order.findAll({
+          where: {
+            [Op.or]: [
+              {
+                pickup_date: {
+                  [Op.between]: [todayStart, todayEnd],
+                },
+              },
+              {
+                delivery_date: {
+                  [Op.between]: [todayStart, todayEnd],
+                },
+              },
+            ],
+            status: {
+              [Op.notIn]: [OrderStatus.PICKUP_STARTED, OrderStatus.DELIVERY_STARTED],
+            },
+          },
+          order: [["created_date", "DESC"]],
+        });
+    
+        // Initialize the response object
+        const groupedBySlot: Record<TimeSlot, Order[]> = {
+          morning: [],
+          noon: [],
+          evening: [],
+          night: [],
+        };
+    
+        // Group by pickup_slot or delivery_slot
+        for (const order of orders) {
+          // Use pickup_slot if pickup_date is today, else use delivery_slot
+          const isPickupToday =
+            order.pickup_date && order.pickup_date >= todayStart && order.pickup_date <= todayEnd;
+          const isDeliveryToday =
+            order.delivery_date && order.delivery_date >= todayStart && order.delivery_date <= todayEnd;
+    
+          const slot = isPickupToday ? order.pickup_slot : isDeliveryToday ? order.delivery_slot : null;
+    
+          if (slot && groupedBySlot[slot]) {
+            groupedBySlot[slot].push(order);
+          }
+        }
+    
+        res.status(200).json(groupedBySlot);
+      } catch (error) {
+        console.error("Error fetching today's unstarted orders:", error);
+        res.status(500).json({ message: "Internal server error" });
+      }
+    }
 }
