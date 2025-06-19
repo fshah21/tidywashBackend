@@ -444,7 +444,7 @@ export class OrderController {
     
         // 1. Check if confirmationId exists in the OrderConfirmation model
         const orderConfirmation = await OrderConfirmation.findOne({
-          where: { confirmation_id: confirmation_id },
+          where: { id: confirmation_id },
         });
     
         if (!orderConfirmation) {
