@@ -541,12 +541,14 @@ export class OrderController {
     }
 
     static async getCustomerById(customerId: String) {
+      console.log("IN GET CUSTOMER ID", customerId);
       const customer = await axios.get(`https://tidywashbackend.onrender.com/api/getCustomerById/${customerId}`);
       return customer.data;
     }
 
     static async getAddress(addressId: String) {
-      const address = await axios.get(`https://tidywashbackend.onrender.com/api/getCustomerById/${addressId}`);
+      console.log("IN GET ADDRESS", addressId);
+      const address = await axios.get(`https://tidywashbackend.onrender.com/api/getAddressById/${addressId}`);
       return address.data;
     }
 
