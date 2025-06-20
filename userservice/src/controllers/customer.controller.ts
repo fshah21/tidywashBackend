@@ -86,4 +86,23 @@ export class CustomerController {
           return res.status(500).json({ message: "Error fetching customer", error });
         }
     }
+
+    static async getAddressById(req: Request, res: Response) {
+      const addressId = req.params.address_id;
+      console.log("GET ADDRESS BY ID", addressId);
+        try {
+          const address = await Address.findByPk(addressId);
+
+          console.log("ADDRESS", address);
+
+          if (!address) {
+            return res.status(404).json({ message: "Address not found" });
+          }
+
+          return res.status(200).json(address);
+        } catch (error) {
+          console.error("Error fetching address:", error);
+          return res.status(500).json({ message: "Error fetching address", error });
+        }
+    }
 }

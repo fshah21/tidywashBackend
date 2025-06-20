@@ -362,6 +362,21 @@ export class OrderController {
           },
           order: [["created_date", "DESC"]],
         });
+
+        const enhancedOrders = await Promise.all(
+          orders.map(async (order) => {
+            const [customer, address] = await Promise.all([
+              OrderController.getCustomerById(order.customer_id),
+              OrderController.getAddress(order.address_id),
+            ]);
+        
+            return {
+              ...order.toJSON(), // Make sure Sequelize model is converted to plain object
+              customer,
+              address,
+            };
+          })
+        );
     
         // Group by pickup or delivery slot
         const groupedBySlot: Record<TimeSlot, Order[]> = {
@@ -371,7 +386,7 @@ export class OrderController {
           night: [],
         };
     
-        for (const order of orders) {
+        for (const order of enhancedOrders) {
           const isPickupToday =
             order.pickup_date &&
             order.pickup_date >= todayStart &&
@@ -486,6 +501,16 @@ export class OrderController {
         console.error("Error completing pickup:", error);
         return res.status(500).json({ message: "Internal server error" });
       }
+    }
+
+    static async getCustomerById(customerId: String) {
+      const customer = await axios.get(`https://tidywashbackend.onrender.com/api/getCustomerById/${customerId}`);
+      return customer;
+    }
+
+    static async getAddress(addressId: String) {
+      const address = await axios.get(`https://tidywashbackend.onrender.com/api/getCustomerById/${addressId}`);
+      return address;
     }
 
     // static async completeDelivery(req: Request, res: Response) {
