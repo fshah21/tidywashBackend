@@ -6,6 +6,20 @@ import { Op } from 'sequelize';
 import axios from "axios";
 import { OrderConfirmation } from "../models/orderConfirmation.model";
 import { TimeSlot } from "../models/order.model";
+import admin from 'firebase-admin';
+
+if (!admin.apps.length) {
+  const serviceAccountJSON = Buffer.from(
+    process.env.FIREBASE_SERVICE_ACCOUNT_BASE64!,
+    'base64'
+  ).toString('utf-8');
+
+  const serviceAccount = JSON.parse(serviceAccountJSON);
+
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+  });
+}
 
 export class OrderController {
     static async healthCheck(_req: Request, res: Response) {
@@ -300,6 +314,29 @@ export class OrderController {
         });
 
         // ✅ In production, you should send OTP via SMS or push notification
+
+        const customer = await OrderController.getCustomerById(order.customer_id);
+
+        const fcmToken = customer?.user?.device_tokens[0]; // Adjust key name based on your response
+        const notificationTitle = type === "pickup" ? "Pickup OTP" : "Delivery OTP";
+        const notificationBody = `Your ${type} OTP for order : #${order.ref_order_id} is ${otp}.`;
+
+        if (fcmToken) {
+          await admin.messaging().send({
+            token: fcmToken,
+            notification: {
+              title: notificationTitle,
+              body: notificationBody,
+            },
+            data: {
+              orderId: order.id.toString(),
+              type,
+            },
+          });
+        } else {
+          console.warn(`No FCM token found for customer ID ${order.customer_id}`);
+        }
+
         return res.status(200).json({
           message: "OTP generated successfully",
           confirmation_id: confirmation.id,
@@ -505,12 +542,12 @@ export class OrderController {
 
     static async getCustomerById(customerId: String) {
       const customer = await axios.get(`https://tidywashbackend.onrender.com/api/getCustomerById/${customerId}`);
-      return customer;
+      return customer.data;
     }
 
     static async getAddress(addressId: String) {
       const address = await axios.get(`https://tidywashbackend.onrender.com/api/getCustomerById/${addressId}`);
-      return address;
+      return address.data;
     }
 
     // static async completeDelivery(req: Request, res: Response) {
