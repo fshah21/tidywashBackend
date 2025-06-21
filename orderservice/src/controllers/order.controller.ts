@@ -318,6 +318,7 @@ export class OrderController {
         const customer = await OrderController.getCustomerById(order.customer_id);
 
         const fcmToken = customer?.user?.device_tokens[0]; // Adjust key name based on your response
+        console.log("FCM TOKEN", fcmToken);
         const notificationTitle = type === "pickup" ? "Pickup OTP" : "Delivery OTP";
         const notificationBody = `Your ${type} OTP for order : #${order.ref_order_id} is ${otp}.`;
 
