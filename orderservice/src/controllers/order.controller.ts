@@ -317,25 +317,38 @@ export class OrderController {
 
         const customer = await OrderController.getCustomerById(order.customer_id);
 
-        const fcmToken = customer?.user?.device_tokens[0]; // Adjust key name based on your response
+        const fcmToken = customer?.user?.device_tokens?.[0]; // Adjust key name based on your response
         console.log("FCM TOKEN", fcmToken);
         const notificationTitle = type === "pickup" ? "Pickup OTP" : "Delivery OTP";
         const notificationBody = `Your ${type} OTP for order : #${order.ref_order_id} is ${otp}.`;
 
         if (fcmToken) {
-          await admin.messaging().send({
-            token: fcmToken,
-            notification: {
-              title: notificationTitle,
-              body: notificationBody,
-            },
-            data: {
-              orderId: order.id.toString(),
-              type,
-            },
-          });
+          try {
+            await admin.messaging().send({
+              token: fcmToken,
+              notification: {
+                title: notificationTitle,
+                body: notificationBody,
+              },
+              data: {
+                orderId: order.id.toString(),
+                type,
+              },
+            });
+            console.log(`✅ Notification sent to ${fcmToken}`);
+          } catch (error) {
+            console.error(`❌ Failed to send notification:`, error?.message || error);
+            // Optional: handle specific error codes if needed
+            if (
+              error.code === "messaging/registration-token-not-registered" ||
+              error.code === "messaging/invalid-argument"
+            ) {
+              console.warn("⚠️ Invalid FCM token, consider removing it:", fcmToken);
+              // Optionally: mark this token as invalid in your DB
+            }
+          }
         } else {
-          console.warn(`No FCM token found for customer ID ${order.customer_id}`);
+          console.warn(`⚠️ No FCM token found for customer ID ${order.customer_id}`);
         }
 
         return res.status(200).json({
