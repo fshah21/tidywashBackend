@@ -198,9 +198,14 @@ export class OrderController {
         }
         console.log("ORDER", order);
 
+        const customer = OrderController.getCustomerById(order.customer_id);
+        const address = OrderController.getCustomerById(order.address_id);
+
         return res.status(200).json({
           message: "Orders found successfully",
-          order: order
+          order: order,
+          customer: customer,
+          address: address
         });
       } catch (error) {
         console.error("Error getting active orders by customer id:", error);
