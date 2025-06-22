@@ -198,8 +198,8 @@ export class OrderController {
         }
         console.log("ORDER", order);
 
-        const customer = OrderController.getCustomerById(order.customer_id);
-        const address = OrderController.getAddress(order.address_id);
+        const customer = await OrderController.getCustomerById(order.customer_id);
+        const address = await OrderController.getAddress(order.address_id);
 
         return res.status(200).json({
           message: "Orders found successfully",
