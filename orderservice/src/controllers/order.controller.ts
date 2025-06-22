@@ -199,7 +199,7 @@ export class OrderController {
         console.log("ORDER", order);
 
         const customer = OrderController.getCustomerById(order.customer_id);
-        const address = OrderController.getCustomerById(order.address_id);
+        const address = OrderController.getAddress(order.address_id);
 
         return res.status(200).json({
           message: "Orders found successfully",
