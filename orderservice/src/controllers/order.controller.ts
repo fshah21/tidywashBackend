@@ -201,9 +201,16 @@ export class OrderController {
         const customer = await OrderController.getCustomerById(order.customer_id);
         const address = await OrderController.getAddress(order.address_id);
 
+        const confirmations = await OrderConfirmation.findAll({
+          where:{
+            order_id: order.id
+          }
+        })
+
         return res.status(200).json({
           message: "Orders found successfully",
           order: order,
+          confirmations: confirmations,
           customer: customer,
           address: address
         });
