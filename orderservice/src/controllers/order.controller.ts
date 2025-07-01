@@ -215,6 +215,7 @@ export class OrderController {
         }
     
         const orderIds = orders.map(order => order.id);
+        console.log("ORDER IDS", orderIds);
     
         const confirmations = await OrderConfirmation.findAll({
           where: {
@@ -222,6 +223,8 @@ export class OrderController {
           },
           raw: true,
         });
+
+        console.log("CONFIRMATIONS", confirmations);
     
         const confirmationsByOrderId = confirmations.reduce((acc, conf) => {
           if (!acc[conf.order_id]) acc[conf.order_id] = [];
@@ -236,6 +239,8 @@ export class OrderController {
             confirmations: confirmationsByOrderId[plainOrder.id] || [],
           };
         });
+
+        console.log("ENRICHED ORDERS", enrichedOrders);
     
         return res.status(200).json({
           message: "Orders found successfully",
