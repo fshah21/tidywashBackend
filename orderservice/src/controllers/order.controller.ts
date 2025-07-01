@@ -206,44 +206,47 @@ export class OrderController {
         const { customer_id } = req.params;
     
         const orders = await Order.findAll({
-          where: {
-            customer_id: customer_id
-          },
-          order: [['created_date', 'DESC']]  // 🔥 Sort by created_date descending
+          where: { customer_id },
+          order: [['created_date', 'DESC']],
         });
+    
         if (!orders || orders.length === 0) {
           return res.status(404).json({ message: "No active orders for this customer" });
         }
-        
+    
         const orderIds = orders.map(order => order.id);
-        
-        // Step 2: Get confirmations for those order IDs
+    
         const confirmations = await OrderConfirmation.findAll({
           where: {
-            order_id: orderIds, // Sequelize will automatically create IN clause
+            order_id: orderIds,
           },
           raw: true,
         });
-        
-        // Step 3: Group confirmations by order_id
+    
         const confirmationsByOrderId = confirmations.reduce((acc, conf) => {
           if (!acc[conf.order_id]) acc[conf.order_id] = [];
           acc[conf.order_id].push(conf);
           return acc;
-        }, {});
-        
-        // Step 4: Attach to each order
-        const enrichedOrders = orders.map(order => ({
-          ...order,
-          confirmations: confirmationsByOrderId[order.id] || [],
-        }));
-        
-        // Step 5: Return enriched result
+        }, {} as Record<string, any[]>);
+    
+        const enrichedOrders = orders.map(order => {
+          const plainOrder = order.get({ plain: true }); // ✅ convert to plain object
+          return {
+            ...plainOrder,
+            confirmations: confirmationsByOrderId[plainOrder.id] || [],
+          };
+        });
+    
         return res.status(200).json({
           message: "Orders found successfully",
           orders: enrichedOrders,
         });
-    }
+    
+      } catch (error) {
+        console.error("Error fetching active orders:", error);
+        return res.status(500).json({ message: "Internal server error" });
+      }
+    }    
 
     static async getOrderDetails(req: Request, res: Response) {
       try {
