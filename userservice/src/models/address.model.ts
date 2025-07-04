@@ -61,4 +61,10 @@ export class Address extends Model {
 
   @Column({ type: DataType.STRING, allowNull: false })
   nick_name: string;
+
+  @Column({ type: DataType.DOUBLE, allowNull: true })
+  latitude: number;
+
+  @Column({ type: DataType.DOUBLE, allowNull: true })
+  longitude: number;
 }

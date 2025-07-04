@@ -35,6 +35,8 @@ export class CustomerController {
               pincode,
               country,
               nick_name,
+              latitude,
+              longitude,
             } = req.body;
       
             if (!customer_id || !line1 || !city || !state || !pincode || !country || !nick_name) {
@@ -50,6 +52,8 @@ export class CustomerController {
               pincode,
               country,
               nick_name,
+              latitude,
+              longitude,
             });
       
             return res.status(201).json({
