@@ -18,7 +18,8 @@ export enum OrderStatus {
     DELIVERY_STARTED = "delivery_started",
     PICKUP_COMPLETED = "pickup_completed",
     DELIVERY_COMPLETED = "delivery_completed",
-    COMPLETED = "completed"
+    COMPLETED = "completed",
+    CANCELLED = "cancelled"
 }
 
 export enum TimeSlot {

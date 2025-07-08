@@ -746,6 +746,22 @@ export class OrderController {
       return address.data;
     }
 
+    static async cancelOrder(req: Request, res: Response) {
+      const { order_id } = req.body;
+
+      await Order.update({
+        status: OrderStatus.CANCELLED
+      }, {
+        where: {
+          id: order_id
+        }
+      });
+
+      return res.status(200).send({
+        message: "Order is cancelled"
+      });
+    }
+
     // static async completeDelivery(req: Request, res: Response) {
     // }
 }
