@@ -544,6 +544,108 @@ export class OrderController {
       }
     }    
 
+    static async getAvailableOrdersByDate(req: Request, res: Response) {
+      try {
+        const { employee_id, date } = req.query;
+    
+        if (!employee_id || !date) {
+          return res.status(400).json({ message: "Missing employee_id or date" });
+        }
+    
+        const selectedDate = new Date(date as string);
+        selectedDate.setHours(0, 0, 0, 0);
+    
+        const dayEnd = new Date(selectedDate);
+        dayEnd.setHours(23, 59, 59, 999);
+    
+        const orders = await Order.findAll({
+          where: {
+            [Op.and]: [
+              {
+                [Op.or]: [
+                  {
+                    [Op.and]: [
+                      { pickup_date: { [Op.between]: [selectedDate, dayEnd] } },
+                      { status: { [Op.notIn]: ["pickup_started", "delivery_started"] } },
+                    ],
+                  },
+                  {
+                    [Op.and]: [
+                      { delivery_date: { [Op.between]: [selectedDate, dayEnd] } },
+                      { status: { [Op.notIn]: ["pickup_started", "delivery_started"] } },
+                    ],
+                  },
+                  {
+                    [Op.and]: [
+                      { status: "pickup_started" },
+                      { pickup_employee_id: employee_id },
+                    ],
+                  },
+                  {
+                    [Op.and]: [
+                      { status: "delivery_started" },
+                      { delivery_employee_id: employee_id },
+                    ],
+                  },
+                ],
+              },
+              {
+                status: { [Op.not]: "delivery_completed" },
+              },
+            ],
+          },
+          order: [["created_date", "DESC"]],
+        });
+    
+        const enhancedOrders = await Promise.all(
+          orders.map(async (order) => {
+            const [customer, address] = await Promise.all([
+              OrderController.getCustomerById(order.customer_id),
+              OrderController.getAddress(order.address_id),
+            ]);
+    
+            return {
+              ...order.toJSON(),
+              customer,
+              address,
+            };
+          })
+        );
+    
+        const groupedBySlot: Record<TimeSlot, Order[]> = {
+          morning: [],
+          noon: [],
+          evening: [],
+          night: [],
+        };
+    
+        for (const order of enhancedOrders) {
+          const isPickup = order.pickup_date &&
+            order.pickup_date >= selectedDate &&
+            order.pickup_date <= dayEnd;
+    
+          const isDelivery = order.delivery_date &&
+            order.delivery_date >= selectedDate &&
+            order.delivery_date <= dayEnd;
+    
+          const slot = isPickup
+            ? order.pickup_slot
+            : isDelivery
+              ? order.delivery_slot
+              : null;
+    
+          if (slot && groupedBySlot[slot]) {
+            groupedBySlot[slot].push(order);
+          }
+        }
+    
+        res.status(200).json(groupedBySlot);
+      } catch (error) {
+        console.error("Error fetching orders by date:", error);
+        res.status(500).json({ message: "Internal server error" });
+      }
+    }    
+
     static async startPickup(req: Request, res: Response) {
       const { order_id } = req.params;
       const { employee_id } = req.body;
