@@ -590,7 +590,7 @@ export class OrderController {
                 ],
               },
               {
-                status: { [Op.not]: "delivery_completed" },
+                status: { [Op.not]: ["delivery_completed", "cancelled"] },
               },
             ],
           },
