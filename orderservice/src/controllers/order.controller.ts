@@ -203,6 +203,7 @@ export class OrderController {
 
     static async getActiveOrdersByCustomerId(req: Request, res: Response) {
       try {
+        console.log("GET ACTIVE ORDERS BY CUSTOMER ID");
         const { customer_id } = req.params;
     
         const orders = await Order.findAll({
