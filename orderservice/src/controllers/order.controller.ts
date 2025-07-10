@@ -206,7 +206,11 @@ export class OrderController {
         const { customer_id } = req.params;
     
         const orders = await Order.findAll({
-          where: { customer_id },
+          where: { customer_id, 
+            status: {
+              [Op.not]: 'cancelled'
+            }
+          },
           order: [['created_date', 'DESC']],
         });
     
