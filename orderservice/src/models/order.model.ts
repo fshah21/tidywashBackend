@@ -51,7 +51,7 @@ export class Order extends Model {
     @ForeignKey(() => CustomerMembership)
     @Column({
         type: DataType.UUID,
-        allowNull: false,
+        allowNull: true,
     })
     user_membership_id: UUID;
 
