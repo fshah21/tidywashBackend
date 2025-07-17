@@ -14,6 +14,7 @@ import { Order } from "./models/order.model";
 import { OrderConfirmation } from "./models/orderConfirmation.model";
 import { Membership } from "./models/membership.model";
 import { CustomerMembership } from "./models/customerMemberships.model";
+import { membershipRoutes } from "./routes/membership.routes";
 
 const app = express();
 const runtimeOpts = {
@@ -29,6 +30,7 @@ app.use(json());
 app.use("/api", orderRoutes);
 app.use("/api", cartRoutes);
 app.use("/api/pricing", pricingRoutes);
+app.use("/api", membershipRoutes);
 
 
 const PORT = process.env.PORT || 3000;
