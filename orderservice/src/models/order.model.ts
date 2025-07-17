@@ -6,9 +6,12 @@ import {
     CreatedAt,
     UpdatedAt,
     DataType,
+    ForeignKey,
+    BelongsTo
   } from "sequelize-typescript";
   
 import { UUID } from "crypto";
+import { CustomerMembership } from "./customerMemberships.model";
 
 export enum OrderStatus {
     ACTIVE = "active",
@@ -19,7 +22,8 @@ export enum OrderStatus {
     PICKUP_COMPLETED = "pickup_completed",
     DELIVERY_COMPLETED = "delivery_completed",
     COMPLETED = "completed",
-    CANCELLED = "cancelled"
+    CANCELLED = "cancelled",
+    SCHEDULED = "scheduled"
 }
 
 export enum TimeSlot {
@@ -43,6 +47,16 @@ export class Order extends Model {
         allowNull: false,
     })
     customer_id: UUID;
+
+    @ForeignKey(() => CustomerMembership)
+    @Column({
+        type: DataType.UUID,
+        allowNull: false,
+    })
+    user_membership_id: UUID;
+
+    @BelongsTo(() => CustomerMembership)
+    user_memebership: CustomerMembership;
 
     @Column({
         type: DataType.STRING,

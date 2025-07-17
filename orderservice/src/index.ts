@@ -12,6 +12,8 @@ import { CartItem } from "./models/cartItem.model";
 import { Cart } from "./models/cart.model";
 import { Order } from "./models/order.model";
 import { OrderConfirmation } from "./models/orderConfirmation.model";
+import { Membership } from "./models/membership.model";
+import { CustomerMembership } from "./models/customerMemberships.model";
 
 const app = express();
 const runtimeOpts = {
@@ -47,7 +49,7 @@ function getSequelizeInstance() {
       sequelize = new Sequelize('postgres', 'postgres.uqohgtgpqijblzljdaxl', 'tidywash-prod', {
         host: 'aws-0-ap-south-1.pooler.supabase.com',
         dialect: 'postgres',
-        models: [Pricing, Cart, CartItem, Order, OrderConfirmation],
+        models: [Pricing, Cart, CartItem, Order, OrderConfirmation, Membership, CustomerMembership],
       });
     }
     
