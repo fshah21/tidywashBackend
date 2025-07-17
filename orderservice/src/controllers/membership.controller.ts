@@ -32,7 +32,7 @@ export class MembershipController {
 
             const plan = await Membership.findOne({
                 where: {
-                    type: type
+                    name: type
                 }
             })
             if (!plan) return res.status(400).json({ message: "Invalid plan_id" });
