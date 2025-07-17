@@ -100,17 +100,20 @@ export class MembershipController {
                     total_price: 0,
                 },
                 ]);
+
+                const randomRefId = `TW-${Math.floor(100000 + Math.random() * 900000)}`;
             
                 // 3. Attach cart to the order (if you have a cart_id or similar column)
                 ordersToCreate.push({
-                customer_id,
-                membership_id: membership.id,
-                pickup_date: pickupDate,
-                pickup_slot: preferred_pickup_slot,
-                delivery_date: deliveryDate,
-                delivery_slot: preferred_delivery_slot,
-                address_id,
-                cart_id: cart.id, // 🔁 make sure your Order model has this
+                    customer_id,
+                    membership_id: membership.id,
+                    pickup_date: pickupDate,
+                    pickup_slot: preferred_pickup_slot,
+                    delivery_date: deliveryDate,
+                    delivery_slot: preferred_delivery_slot,
+                    address_id,
+                    cart_id: cart.id, // 🔁 make sure your Order model has this
+                    ref_order_id: randomRefId
                 });
             }
             
