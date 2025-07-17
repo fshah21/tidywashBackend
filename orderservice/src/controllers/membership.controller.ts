@@ -27,9 +27,16 @@ export class MembershipController {
               preferred_pickup_slot,
               preferred_delivery_day,
               preferred_delivery_slot,
-              plan_id,
               type
             } = req.body;
+
+            const plan = await Membership.findOne({
+                where: {
+                    type: type
+                }
+            })
+            if (!plan) return res.status(400).json({ message: "Invalid plan_id" });
+            const plan_id = plan.id;
       
             // 1. Create membership record
             const membership = await CustomerMembership.create({
@@ -45,8 +52,7 @@ export class MembershipController {
             });
       
             // 2. Get membership plan
-            const plan = await Membership.findByPk(plan_id);
-            if (!plan) return res.status(400).json({ message: "Invalid plan_id" });
+          
       
             const { total_orders, interval_days } = plan;
       
@@ -106,7 +112,7 @@ export class MembershipController {
                 // 3. Attach cart to the order (if you have a cart_id or similar column)
                 ordersToCreate.push({
                     customer_id,
-                    membership_id: membership.id,
+                    user_membership_id: membership.id,
                     pickup_date: pickupDate,
                     pickup_slot: preferred_pickup_slot,
                     delivery_date: deliveryDate,
