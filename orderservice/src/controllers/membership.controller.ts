@@ -6,6 +6,7 @@ import { CartItem } from "../models/cartItem.model";
 import { Order } from "../models/order.model"; // Assuming you have this model
 import { addDays } from "date-fns"; // Use date-fns for clarity
 import { Pricing, PricingCategory, GarmentType } from "../models/pricing.model";
+import axios from "axios";
 
 export enum Day {
     SUNDAY = "sunday",
@@ -138,6 +139,34 @@ export class MembershipController {
           }
 
     }
+
+    static async getMembershipDetails(req: Request, res: Response) {
+        const { membership_id } = req.params;
+
+        const membership = await CustomerMembership.findByPk(membership_id);
+
+        const customer = await MembershipController.getCustomerById(membership.customer_id);
+        const address = await MembershipController.getAddress(membership.address_id);
+
+        return res.status(200).send({
+            membership: membership,
+            customer: customer,
+            address: address
+        })
+    }
+
+    static async getCustomerById(customerId: String) {
+        console.log("IN GET CUSTOMER ID", customerId);
+        const customer = await axios.get(`https://tidywashbackend.onrender.com/api/getCustomerById/${customerId}`);
+        return customer.data;
+    }
+
+    static async getAddress(addressId: String) {
+        console.log("IN GET ADDRESS", addressId);
+        const address = await axios.get(`https://tidywashbackend.onrender.com/api/getAddressById/${addressId}`);
+        return address.data;
+    }
+  
 }
 
 function dayStringToIndex(day: Day): number {
