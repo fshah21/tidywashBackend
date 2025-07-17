@@ -109,6 +109,13 @@ export class MembershipController {
                 ]);
 
                 const randomRefId = `TW-${Math.floor(100000 + Math.random() * 900000)}`;
+
+                if (i == 0) {
+                    await membership.update(
+                        { next_order_date: pickupDate },
+                        { where: { id: membership.id } }
+                    );
+                }
             
                 // 3. Attach cart to the order (if you have a cart_id or similar column)
                 ordersToCreate.push({
