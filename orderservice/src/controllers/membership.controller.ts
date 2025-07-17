@@ -1,8 +1,11 @@
 import { Request, Response } from "express";
 import { CustomerMembership } from "../models/customerMemberships.model";
 import { Membership } from "../models/membership.model";
+import { Cart } from "../models/cart.model"; 
+import { CartItem } from "../models/cartItem.model";
 import { Order } from "../models/order.model"; // Assuming you have this model
 import { addDays } from "date-fns"; // Use date-fns for clarity
+import { Pricing, PricingCategory, GarmentType } from "../models/pricing.model";
 
 export enum Day {
     SUNDAY = "sunday",
@@ -53,13 +56,53 @@ export class MembershipController {
       
             const firstPickupDate = getNextWeekday(today, preferredPickupDayIndex);
       
-            // 4. Create all orders
+            // Get pricing IDs for tops and bottoms (wash & iron)
+            const washAndIronPrices = await Pricing.findAll({
+                where: {
+                category: PricingCategory.WASH_AND_IRON,
+                garment_type: [GarmentType.TOPS, GarmentType.BOTTOMS],
+                },
+            });
+            
+            const topsPricing = washAndIronPrices.find(p => p.garment_type === GarmentType.TOPS);
+            const bottomsPricing = washAndIronPrices.find(p => p.garment_type === GarmentType.BOTTOMS);
+            
+            if (!topsPricing || !bottomsPricing) {
+                return res.status(500).json({ message: "Required pricing entries not found" });
+            }
+            
             const ordersToCreate = [];
+            
             for (let i = 0; i < total_orders; i++) {
-              const pickupDate = addDays(firstPickupDate, i * interval_days);
-              const deliveryDate = getNextWeekday(pickupDate, dayStringToIndex(preferred_delivery_day));
-      
-              ordersToCreate.push({
+                const pickupDate = addDays(firstPickupDate, i * interval_days);
+                const deliveryDate = getNextWeekday(pickupDate, dayStringToIndex(preferred_delivery_day));
+            
+                // 1. Create Cart
+                const cart = await Cart.create({
+                customer_id,
+                total_amount: 0,
+                });
+            
+                // 2. Create CartItems with quantity and zero pricing
+                await CartItem.bulkCreate([
+                {
+                    cart_id: cart.id,
+                    pricing_id: topsPricing.id,
+                    quantity: 5,
+                    unit_price: 0,
+                    total_price: 0,
+                },
+                {
+                    cart_id: cart.id,
+                    pricing_id: bottomsPricing.id,
+                    quantity: 5,
+                    unit_price: 0,
+                    total_price: 0,
+                },
+                ]);
+            
+                // 3. Attach cart to the order (if you have a cart_id or similar column)
+                ordersToCreate.push({
                 customer_id,
                 membership_id: membership.id,
                 pickup_date: pickupDate,
@@ -67,11 +110,13 @@ export class MembershipController {
                 delivery_date: deliveryDate,
                 delivery_slot: preferred_delivery_slot,
                 address_id,
-              });
+                cart_id: cart.id, // 🔁 make sure your Order model has this
+                });
             }
-      
+            
+            // Now create all orders
             await Order.bulkCreate(ordersToCreate);
-      
+
             // 5. Set membership end date
             const endDate = addDays(firstPickupDate, (total_orders - 1) * interval_days);
             membership.end_date = endDate;
