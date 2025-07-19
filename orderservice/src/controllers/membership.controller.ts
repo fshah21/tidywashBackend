@@ -38,23 +38,40 @@ export class MembershipController {
             })
             if (!plan) return res.status(400).json({ message: "Invalid plan_id" });
             const plan_id = plan.id;
-      
-            // 1. Create membership record
-            const membership = await CustomerMembership.create({
-              customer_id,
-              plan_id,
-              type,
-              address_id,
-              preferred_pickup_day,
-              preferred_pickup_slot,
-              preferred_delivery_day,
-              preferred_delivery_slot,
-              start_date: new Date(), // today
+
+            let membership = await CustomerMembership.findOne({
+                where: {
+                    customer_id,
+                    plan_id,
+                }
             });
-      
-            // 2. Get membership plan
-          
-      
+    
+            if (membership) {
+                // ✅ Update existing membership
+                await membership.update({
+                  address_id,
+                  preferred_pickup_day,
+                  preferred_pickup_slot,
+                  preferred_delivery_day,
+                  preferred_delivery_slot,
+                  start_date: new Date(), // optional: reset start date
+                });
+              } else {
+                // ✅ Create new membership
+                membership = await CustomerMembership.create({
+                  customer_id,
+                  plan_id,
+                  type,
+                  address_id,
+                  preferred_pickup_day,
+                  preferred_pickup_slot,
+                  preferred_delivery_day,
+                  preferred_delivery_slot,
+                  start_date: new Date(),
+                });
+              }
+
+            // 2. Get membership plan      
             const { total_orders, interval_days } = plan;
       
             // 3. Calculate first pickup date
