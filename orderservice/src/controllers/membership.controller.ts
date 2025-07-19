@@ -7,6 +7,7 @@ import { Order } from "../models/order.model"; // Assuming you have this model
 import { addDays } from "date-fns"; // Use date-fns for clarity
 import { Pricing, PricingCategory, GarmentType } from "../models/pricing.model";
 import axios from "axios";
+import { Op } from "sequelize";
 
 export enum Day {
     SUNDAY = "sunday",
@@ -56,6 +57,46 @@ export class MembershipController {
                   preferred_delivery_slot,
                   start_date: new Date(), // optional: reset start date
                 });
+
+                const inProgressStatuses = [
+                    "pickup_started",
+                    "pickup_completed",
+                    "delivery_started",
+                    "delivery_completed"
+                ];
+
+                const existingOrders = await Order.findAll({
+                    where: {
+                    user_membership_id: membership.id,
+                    status: {
+                        [Op.notIn]: inProgressStatuses
+                    }
+                    },
+                    order: [['pickup_date', 'ASC']]
+                });
+
+                const today = new Date();
+                const preferredPickupDayIndex = dayStringToIndex(preferred_pickup_day);
+                const firstPickupDate = getNextWeekday(today, preferredPickupDayIndex);
+
+                for (let i = 0; i < existingOrders.length; i++) {
+                    const order = existingOrders[i];
+                    const newPickupDate = addDays(firstPickupDate, i * plan.interval_days);
+                    const newDeliveryDate = getNextWeekday(newPickupDate, dayStringToIndex(preferred_delivery_day));
+
+                    await order.update({
+                    pickup_date: newPickupDate,
+                    pickup_slot: preferred_pickup_slot,
+                    delivery_date: newDeliveryDate,
+                    delivery_slot: preferred_delivery_slot,
+                    address_id
+                    });
+
+                    if (i === 0) {
+                    // Set the next order date
+                    await membership.update({ next_order_date: newPickupDate });
+                    }
+                }
               } else {
                 // ✅ Create new membership
                 membership = await CustomerMembership.create({
@@ -69,9 +110,8 @@ export class MembershipController {
                   preferred_delivery_slot,
                   start_date: new Date(),
                 });
-              }
 
-            // 2. Get membership plan      
+                  // 2. Get membership plan      
             const { total_orders, interval_days } = plan;
       
             // 3. Calculate first pickup date
@@ -148,20 +188,19 @@ export class MembershipController {
                 });
             }
             
-            // Now create all orders
-            await Order.bulkCreate(ordersToCreate);
+                // Now create all orders
+                await Order.bulkCreate(ordersToCreate);
 
-            // 5. Set membership end date
-            const endDate = addDays(firstPickupDate, (total_orders - 1) * interval_days);
-            membership.end_date = endDate;
-            await membership.save();
-      
+                // 5. Set membership end date
+                const endDate = addDays(firstPickupDate, (total_orders - 1) * interval_days);
+                membership.end_date = endDate;
+                await membership.save();
+            }
             return res.status(201).json({ message: "Membership created and orders scheduled", membership });
           } catch (err) {
             console.error(err);
             return res.status(500).json({ message: "Internal server error" });
           }
-
     }
 
     static async getMembershipDetails(req: Request, res: Response) {
