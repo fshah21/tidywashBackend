@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { CustomerMembership } from "../models/customerMemberships.model";
-import { Membership } from "../models/membership.model";
+import { Membership, MembershipStatus } from "../models/membership.model";
 import { Cart } from "../models/cart.model"; 
 import { CartItem } from "../models/cartItem.model";
 import { Order } from "../models/order.model"; // Assuming you have this model
@@ -56,6 +56,7 @@ export class MembershipController {
                   preferred_delivery_day,
                   preferred_delivery_slot,
                   start_date: new Date(), // optional: reset start date
+                  status: MembershipStatus.ACTIVE
                 });
 
                 const inProgressStatuses = [
@@ -109,6 +110,7 @@ export class MembershipController {
                   preferred_delivery_day,
                   preferred_delivery_slot,
                   start_date: new Date(),
+                  status: MembershipStatus.ACTIVE
                 });
 
                   // 2. Get membership plan      
@@ -220,6 +222,20 @@ export class MembershipController {
             membership: membership,
             customer: customer,
             address: address
+        })
+    }
+
+    static async getActiveMembershipsByCustomerId(req: Request, res: Response) {
+        const { customer_id } = req.params;
+
+        const memberships = await CustomerMembership.findAll({
+            where: {
+                customer_id: customer_id
+            }
+        });
+
+        return res.status(200).send({
+            memberships: memberships
         })
     }
 

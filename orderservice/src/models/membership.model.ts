@@ -10,6 +10,12 @@ import {
   
 import { UUID } from "crypto";
 
+export enum MembershipStatus {
+  ACTIVE = "active",
+  CANCELLED = "cancelled",
+  EXPIRED = "expired"
+}
+
 @Table({ tableName: 'memberships' })
 export class Membership extends Model {
   @PrimaryKey
@@ -28,6 +34,13 @@ export class Membership extends Model {
   @Column({ type: DataType.DECIMAL(10, 2), allowNull: false }) // e.g. 1000, 3000
   price: number;
 
+  @Column({
+    type: DataType.ENUM(...Object.values(MembershipStatus)),
+    allowNull: true,
+    defaultValue: MembershipStatus.ACTIVE, 
+  })
+  status: MembershipStatus;
+  
   @CreatedAt
   @Column({ type: DataType.DATE })
   created_date: Date;
