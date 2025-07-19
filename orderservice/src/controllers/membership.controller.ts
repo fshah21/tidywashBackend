@@ -148,12 +148,17 @@ export class MembershipController {
     }
 
     static async getMembershipDetails(req: Request, res: Response) {
+        console.log("IN GET MEMBERSHIP DETAILS");
         const { membership_id } = req.params;
+        console.log("MEMBERSHIP ID", membership_id);
 
         const membership = await CustomerMembership.findByPk(membership_id);
+        console.log("MEMBERSHIP", membership);
 
         const customer = await MembershipController.getCustomerById(membership.customer_id);
+        console.log("CUSTOMER", customer);
         const address = await MembershipController.getAddress(membership.address_id);
+        console.log("ADDRESS", address);
 
         return res.status(200).send({
             membership: membership,
