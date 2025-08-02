@@ -198,11 +198,11 @@ export class MembershipController {
                 await Order.bulkCreate(ordersToCreate);
 
                 // 5. Set membership end date
-                var endDate;
+                let endDate = new Date(); // Initialize with current date
                 if (type === '1-month') {
-                    endDate.setDate(new Date().getDate() + 30);
+                    endDate.setDate(endDate.getDate() + 30);
                 } else if (type === '3-month') {
-                    endDate.setDate(new Date().getDate() + 90);
+                    endDate.setDate(endDate.getDate() + 90);
                 }
                 membership.end_date = endDate;
                 await membership.save();
