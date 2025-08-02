@@ -76,7 +76,7 @@ export class CustomerMembership extends Model {
 
   @Column({
     type: DataType.STRING,
-    allowNull: false,
+    allowNull: true,
   })
   ref_membership_id: string;
 
