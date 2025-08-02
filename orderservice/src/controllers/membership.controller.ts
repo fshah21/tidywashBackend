@@ -100,6 +100,9 @@ export class MembershipController {
                 }
               } else {
                 // ✅ Create new membership
+
+                const randomRefId = `TWM-${Math.floor(100000 + Math.random() * 900000)}`;
+
                 membership = await CustomerMembership.create({
                   customer_id,
                   plan_id,
@@ -110,7 +113,8 @@ export class MembershipController {
                   preferred_delivery_day,
                   preferred_delivery_slot,
                   start_date: new Date(),
-                  status: MembershipStatus.ACTIVE
+                  status: MembershipStatus.ACTIVE,
+                  ref_membership_id: randomRefId
                 });
 
                   // 2. Get membership plan      
@@ -194,7 +198,12 @@ export class MembershipController {
                 await Order.bulkCreate(ordersToCreate);
 
                 // 5. Set membership end date
-                const endDate = addDays(firstPickupDate, (total_orders - 1) * interval_days);
+                var endDate;
+                if (type === '1-month') {
+                    endDate.setDate(new Date().getDate() + 30);
+                } else if (type === '3-month') {
+                    endDate.setDate(new Date().getDate() + 90);
+                }
                 membership.end_date = endDate;
                 await membership.save();
             }

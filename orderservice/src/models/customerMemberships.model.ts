@@ -74,6 +74,12 @@ export class CustomerMembership extends Model {
   @Column({ type: DataType.DATE })
   next_order_date: Date;
 
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  ref_membership_id: string;
+
   @CreatedAt
   @Column({ type: DataType.DATE })
   created_date: Date;
