@@ -210,7 +210,10 @@ export class OrderController {
           where: { customer_id, 
             status: {
               [Op.not]: 'cancelled'
-            }
+            },
+            user_membership_id: {
+              [Op.is]: null,
+            },
           },
           order: [['created_date', 'DESC']],
         });
