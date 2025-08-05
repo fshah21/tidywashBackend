@@ -91,7 +91,7 @@ export class Order extends Model {
     @Column({
         type: DataType.ENUM(...Object.values(OrderStatus)),
         allowNull: false,
-        defaultValue: OrderStatus.ACTIVE,
+        defaultValue: OrderStatus.PAID,
     })
     status: OrderStatus;
 
