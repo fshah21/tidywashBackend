@@ -235,37 +235,51 @@ export class MembershipController {
     }
 
     static async getActiveMembershipsByCustomerId(req: Request, res: Response) {
-        const { customer_id } = req.params;
+        try {
+            const { customer_id } = req.params;
 
-        const memberships = await CustomerMembership.findAll({
-            where: {
-                customer_id: customer_id,
-                status: {
-                    [Op.notIn]: ['cancelled', 'expired']
-                }
+            if (!customer_id) {
+                return res.status(400).json({ error: 'customer_id is required' });
             }
-        });
 
-        return res.status(200).send({
-            memberships: memberships
-        })
+            const memberships = await CustomerMembership.findAll({
+                where: {
+                    customer_id,
+                    status: {
+                        [Op.notIn]: ['cancelled', 'expired']
+                    }
+                }
+            });
+
+            return res.status(200).json({ memberships });
+        } catch (error) {
+            console.error('Error fetching active memberships:', error);
+            return res.status(500).json({ error: 'Internal server error' });
+        }
     }
 
-     static async getPastMembershipsByCustomerId(req: Request, res: Response) {
-        const { customer_id } = req.params;
+    static async getPastMembershipsByCustomerId(req: Request, res: Response) {
+        try {
+            const { customer_id } = req.params;
 
-        const memberships = await CustomerMembership.findAll({
-            where: {
-                customer_id: customer_id,
-                status: {
-                    [Op.in]: ['cancelled', 'expired']
-                }
+            if (!customer_id) {
+                return res.status(400).json({ error: 'customer_id is required' });
             }
-        });
 
-        return res.status(200).send({
-            memberships: memberships
-        })
+            const memberships = await CustomerMembership.findAll({
+                where: {
+                    customer_id,
+                    status: {
+                        [Op.in]: ['cancelled', 'expired']
+                    }
+                }
+            });
+
+            return res.status(200).json({ memberships });
+        } catch (error) {
+            console.error('Error fetching past memberships:', error);
+            return res.status(500).json({ error: 'Internal server error' });
+        }
     }
 
     static async getCustomerById(customerId: String) {
