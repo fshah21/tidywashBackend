@@ -6,3 +6,4 @@ export const membershipRoutes = Router();
 membershipRoutes.post("/membership/createMembership", MembershipController.createMembership);
 membershipRoutes.get("/membership/getMembershipDetails/:membership_id", MembershipController.getMembershipDetails);
 membershipRoutes.get("/membership/getActiveMembershipsByCustomerId/:customer_id", MembershipController.getActiveMembershipsByCustomerId);
+membershipRoutes.get("/membership/getPastMembershipsByCustomerId/:customer_id", MembershipController.getPastMembershipsByCustomerId);

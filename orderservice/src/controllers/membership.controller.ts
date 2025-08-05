@@ -239,7 +239,27 @@ export class MembershipController {
 
         const memberships = await CustomerMembership.findAll({
             where: {
-                customer_id: customer_id
+                customer_id: customer_id,
+                status: {
+                    [Op.notIn]: ['cancelled', 'expired']
+                }
+            }
+        });
+
+        return res.status(200).send({
+            memberships: memberships
+        })
+    }
+
+     static async getPastMembershipsByCustomerId(req: Request, res: Response) {
+        const { customer_id } = req.params;
+
+        const memberships = await CustomerMembership.findAll({
+            where: {
+                customer_id: customer_id,
+                status: {
+                    [Op.in]: ['cancelled', 'expired']
+                }
             }
         });
 
