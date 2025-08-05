@@ -31,6 +31,12 @@ export enum MembershipType {
     THREE_MONTH = "3-month"
 }
 
+export enum CustomerMembershipStatus {
+  ACTIVE = "active",
+  CANCELLED = "cancelled",
+  EXPIRED = "expired"
+}
+
 @Table({ tableName: 'customer_memberships' })
 export class CustomerMembership extends Model {
   @PrimaryKey
@@ -79,6 +85,13 @@ export class CustomerMembership extends Model {
     allowNull: true,
   })
   ref_membership_id: string;
+
+  @Column({
+    type: DataType.ENUM(...Object.values(CustomerMembershipStatus)),
+    allowNull: true,
+    defaultValue: CustomerMembershipStatus.ACTIVE, 
+  })
+  status: CustomerMembershipStatus;
 
   @CreatedAt
   @Column({ type: DataType.DATE })
