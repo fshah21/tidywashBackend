@@ -351,9 +351,12 @@ export class OrderController {
           }
         })
 
+        const cart = await Cart.findByPk(order.cart_id);
+
         return res.status(200).json({
           message: "Orders found successfully",
           order: order,
+          cart: cart,
           confirmations: confirmations,
           customer: customer,
           address: address
