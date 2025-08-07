@@ -87,6 +87,13 @@ export class CustomerMembership extends Model {
   ref_membership_id: string;
 
   @Column({
+    type: DataType.BOOLEAN,
+    allowNull: true,
+    defaultValue: true
+  })
+  is_cancellable: boolean;
+
+  @Column({
     type: DataType.ENUM(...Object.values(CustomerMembershipStatus)),
     allowNull: true,
     defaultValue: CustomerMembershipStatus.ACTIVE, 

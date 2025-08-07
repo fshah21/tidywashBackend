@@ -7,6 +7,7 @@ import axios from "axios";
 import { OrderConfirmation } from "../models/orderConfirmation.model";
 import { TimeSlot } from "../models/order.model";
 import admin from 'firebase-admin';
+import { CustomerMembership } from "../models/customerMemberships.model";
 
 if (!admin.apps.length) {
   const serviceAccountJSON = Buffer.from(
@@ -188,6 +189,75 @@ export class OrderController {
             }
           } else {
             console.warn(`⚠️ No FCM token found for customer ID ${order.customer_id}`);
+          }
+
+          if (status == "pickup_started") {
+            console.log("STATUS IS PICKUP STARTED");
+            const membership = await CustomerMembership.findByPk(order.user_membership_id);
+
+             if (membership) {
+              membership.is_cancellable = false;
+              await membership.save();
+
+              console.log("✅ Updated is_cancellable to false");
+            } else {
+              console.warn("⚠️ Membership not found for ID:", order.user_membership_id);
+            }
+
+          }
+        }
+
+        if (status == "pickup_completed") {
+          const fcmToken = customer?.user?.device_tokens?.[0]; // Adjust key name based on your response
+          console.log("FCM TOKEN", fcmToken);
+          const notificationTitle = "Pickup Completed";
+          const notificationBody = "Pickup is completed for your order.";
+  
+          if (fcmToken) {
+            try {
+              await admin.messaging().send({
+                token: fcmToken,
+                notification: {
+                  title: notificationTitle,
+                  body: notificationBody,
+                },
+                data: {
+                  orderId: order.id.toString(),
+                },
+              });
+              console.log(`✅ Notification sent to ${fcmToken}`);
+            } catch (error) {
+              console.error(`❌ Failed to send notification:`, error?.message || error);
+              // Optional: handle specific error codes if needed
+              if (
+                error.code === "messaging/registration-token-not-registered" ||
+                error.code === "messaging/invalid-argument"
+              ) {
+                console.warn("⚠️ Invalid FCM token, consider removing it:", fcmToken);
+                // Optionally: mark this token as invalid in your DB
+              }
+            }
+          } else {
+            console.warn(`⚠️ No FCM token found for customer ID ${order.customer_id}`);
+          }
+
+          if (order.user_membership_id) {
+            console.log("ORDER IS FROM A MEMBERSHIP");
+
+            const membership = await CustomerMembership.findByPk(order.user_membership_id);
+
+            if (membership) {
+              const interval_days = 7; // or however you calculate the interval
+              const newNextOrderDate = new Date(order.pickup_date);
+              newNextOrderDate.setDate(newNextOrderDate.getDate() + interval_days);
+
+              membership.next_order_date = newNextOrderDate;
+              await membership.save();
+
+              console.log("✅ Updated next_order_date to", newNextOrderDate);
+            } else {
+              console.warn("⚠️ Membership not found for ID:", order.user_membership_id);
+            }
           }
         }
     
