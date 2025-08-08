@@ -7,3 +7,4 @@ membershipRoutes.post("/membership/createMembership", MembershipController.creat
 membershipRoutes.get("/membership/getMembershipDetails/:membership_id", MembershipController.getMembershipDetails);
 membershipRoutes.get("/membership/getActiveMembershipsByCustomerId/:customer_id", MembershipController.getActiveMembershipsByCustomerId);
 membershipRoutes.get("/membership/getPastMembershipsByCustomerId/:customer_id", MembershipController.getPastMembershipsByCustomerId);
+membershipRoutes.post("/membership/updateMembershipStatus/:membership_id", MembershipController.updateMembershipStatus);

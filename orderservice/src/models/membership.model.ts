@@ -12,6 +12,7 @@ import { UUID } from "crypto";
 
 export enum MembershipStatus {
   ACTIVE = "active",
+  PAID = "paid",
   CANCELLED = "cancelled",
   EXPIRED = "expired"
 }

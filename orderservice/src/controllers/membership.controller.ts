@@ -293,7 +293,31 @@ export class MembershipController {
         const address = await axios.get(`https://tidywashbackend.onrender.com/api/getAddressById/${addressId}`);
         return address.data;
     }
-  
+
+    static async updateMembershipStatus(req: Request, res: Response) {
+        try {
+            const { membership_id } = req.params;
+            const { status } = req.body;
+        
+            // Validate required data (optional: add stricter validation as needed)
+            if (!status) {
+            return res.status(400).json({ message: "Status is blank" });
+            }
+        
+            const membership = await CustomerMembership.findByPk(membership_id);
+            if (!membership) {
+            return res.status(404).json({ message: "Order not found" });
+            }
+        
+            // Update only provided fields
+            if (status) membership.status = status;
+        
+            await membership.save();
+        } catch (error) {
+            console.error("Error updating membership status:", error);
+            return res.status(500).json({ message: "Internal server error" });
+        }   
+    }
 }
 
 function dayStringToIndex(day: Day): number {
