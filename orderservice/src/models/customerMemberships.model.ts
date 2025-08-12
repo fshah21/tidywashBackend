@@ -33,6 +33,7 @@ export enum MembershipType {
 
 export enum CustomerMembershipStatus {
   ACTIVE = "active",
+  PAID = "paid",
   CANCELLED = "cancelled",
   EXPIRED = "expired"
 }
