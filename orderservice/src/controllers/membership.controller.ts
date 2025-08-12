@@ -313,6 +313,10 @@ export class MembershipController {
             if (status) membership.status = status;
         
             await membership.save();
+
+            return res.status(200).json({
+                membership: membership
+            })
         } catch (error) {
             console.error("Error updating membership status:", error);
             return res.status(500).json({ message: "Internal server error" });
