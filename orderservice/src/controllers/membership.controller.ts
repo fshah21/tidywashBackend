@@ -322,6 +322,46 @@ export class MembershipController {
             return res.status(500).json({ message: "Internal server error" });
         }   
     }
+
+    static async getAllMemberships(_req: Request, res: Response) {
+          try {
+            const memberships = await CustomerMembership.findAll({
+              where: {
+                status: {
+                  [Op.notIn]: ["completed", "active"]
+                }
+              },
+              order: [["created_date", "DESC"]]
+            });
+    
+            const customerIds = [...new Set(memberships.map(membership => membership.customer_id))];
+    
+            const customerResponses = await Promise.all(
+              customerIds.map(id =>
+                axios.get(`https://tidywashbackend.onrender.com/api/getCustomerById/${id}`)
+                  .then(res => ({ id, data: res.data }))
+                  .catch(err => ({ id, error: err.message }))
+              )
+            );
+    
+            const customerMap = new Map<string, any>();
+            for (const res of customerResponses) {
+              if ('data' in res) {
+                customerMap.set(res.id, res.data);
+              }
+            }
+    
+            // 5. Attach customer + user data to each order
+            const enrichedOrders = memberships.map(order => ({
+              ...order.toJSON(),
+              customer: customerMap.get(order.customer_id) || null,
+            }));
+        
+            res.status(200).json(enrichedOrders);
+          } catch (error) {
+            res.status(500).json({ message: "Error fetching orders", error });
+          }
+        }
 }
 
 function dayStringToIndex(day: Day): number {

@@ -19,3 +19,4 @@ orderRoutes.put("/orders/startPickup/:order_id", OrderController.startPickup);
 orderRoutes.put("/orders/startDelivery/:order_id", OrderController.startDelivery);
 orderRoutes.post("/orders/completePickup/:confirmation_id", OrderController.completePickup);
 orderRoutes.post("/orders/cancelOrder", OrderController.cancelOrder);
+orderRoutes.get("/orders/getPastOrdersByCustomerId/:customer_id", OrderController.getPastOrdersByCustomerId);

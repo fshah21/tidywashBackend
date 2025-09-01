@@ -407,6 +407,63 @@ export class OrderController {
       }
     }
 
+    static async getPastOrdersByCustomerId(req: Request, res: Response) {
+      try {
+        console.log("GET PAST ORDERS BY CUSTOMER ID");
+        const { customer_id } = req.params;
+    
+        const orders = await Order.findAll({
+          where: { customer_id,
+            user_membership_id: {
+              [Op.is]: null,
+            },
+          },
+          order: [['created_date', 'DESC']],
+        });
+    
+        if (!orders || orders.length === 0) {
+          return res.status(404).json({ message: "No active orders for this customer" });
+        }
+    
+        const orderIds = orders.map(order => order.id);
+        console.log("ORDER IDS", orderIds);
+    
+        const confirmations = await OrderConfirmation.findAll({
+          where: {
+            order_id: orderIds,
+          },
+          raw: true,
+        });
+
+        console.log("CONFIRMATIONS", confirmations);
+    
+        const confirmationsByOrderId = confirmations.reduce((acc, conf) => {
+          if (!acc[conf.order_id]) acc[conf.order_id] = [];
+          acc[conf.order_id].push(conf);
+          return acc;
+        }, {} as Record<string, any[]>);
+    
+        const enrichedOrders = orders.map(order => {
+          const plainOrder = order.get({ plain: true }); // ✅ convert to plain object
+          return {
+            ...plainOrder,
+            confirmations: confirmationsByOrderId[plainOrder.id] || [],
+          };
+        });
+
+        console.log("ENRICHED ORDERS", enrichedOrders);
+    
+        return res.status(200).json({
+          message: "Orders found successfully",
+          orders: enrichedOrders,
+        });
+    
+      } catch (error) {
+        console.error("Error fetching active orders:", error);
+        return res.status(500).json({ message: "Internal server error" });
+      }
+    }    
+
     static async getEmployeeOrderHistory(req: Request, res: Response) {
       try {
         const { employee_id } = req.params;
