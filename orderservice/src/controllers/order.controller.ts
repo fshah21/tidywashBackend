@@ -414,6 +414,9 @@ export class OrderController {
     
         const orders = await Order.findAll({
           where: { customer_id,
+            status: {
+              [Op.notIn]: ["active"]
+            },
             user_membership_id: {
               [Op.is]: null,
             },
