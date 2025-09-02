@@ -26,7 +26,7 @@ export class PricingController {
        const result = Object.entries(grouped).map(([title, items]) => ({
             title,
             items: items.sort(
-                (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+                (a, b) => new Date(a.created_date).getTime() - new Date(b.created_date).getTime()
             ),
         }));
     
