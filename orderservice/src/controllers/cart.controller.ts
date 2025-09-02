@@ -128,4 +128,15 @@ export class CartController {
       cart_items: cartItems
     })
   }
+
+  static async getCartById(req: Request, res: Response) {
+    const { cart_id } = req.params;
+    console.log("GET CART BY ID", cart_id);
+    const cart = await Cart.findByPk(cart_id);
+    console.log("CART", cart);
+
+    return res.status(200).json({
+      cart: cart
+    })
+  }
 }
