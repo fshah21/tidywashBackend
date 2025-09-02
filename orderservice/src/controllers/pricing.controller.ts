@@ -17,14 +17,17 @@ export class PricingController {
                 pricing_id: item.id,
                 garment_type: item.garment_type,
                 unit_price: item.price,
+                created_date: item.created_date,
             });
     
             return acc;
         }, {} as Record<string, any[]>);
     
-        const result = Object.entries(grouped).map(([title, items]) => ({
+       const result = Object.entries(grouped).map(([title, items]) => ({
             title,
-            items,
+            items: items.sort(
+                (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+            ),
         }));
     
         return res.json({ categories: result });
