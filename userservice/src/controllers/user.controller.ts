@@ -23,10 +23,6 @@ export class UserController {
         return res.status(400).json({ message: "Phone number with country code is required" });
       }
 
-      if(!name) {
-        return res.status(400).json({ message: "Name is required" });
-      }
-
       if (!phone_number.country_code.startsWith('+')) {
         phone_number.country_code = `+${phone_number.country_code}`;
       }
