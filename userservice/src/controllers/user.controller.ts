@@ -14,13 +14,17 @@ export class UserController {
   static async createUser(req: Request, res: Response) {
     try {
       console.log("CREATE USER METHOD");
-      const { phone_number } = req.body;
+      const { phone_number, name } = req.body;
       console.log("PHONE NUMBER", req.body);
 
       // Validate required fields
       if (!phone_number || !phone_number.number || !phone_number.country_code) {
         console.log("VALIDATION ISSUE");
         return res.status(400).json({ message: "Phone number with country code is required" });
+      }
+
+      if(!name) {
+        return res.status(400).json({ message: "Name is required" });
       }
 
       if (!phone_number.country_code.startsWith('+')) {
@@ -43,6 +47,12 @@ export class UserController {
         console.log("THIS IS AN EXISTING USER");
         const userID = existingUser.id;
         const role = existingUser.role;
+
+        // 🔹 Update the name if changed
+        if (existingUser.first_name !== name) {
+          existingUser.first_name = name;
+          await existingUser.save();
+        }
 
         if (role == "customer") {
             const existingCustomer = await Customer.findOne({
@@ -118,6 +128,7 @@ export class UserController {
       try {
           // Create new user
           const newUser = await User.create({
+              first_name: name,
               phone_number,
               role: "customer"
           });
