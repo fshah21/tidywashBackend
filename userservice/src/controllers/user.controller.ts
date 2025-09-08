@@ -251,5 +251,41 @@ export class UserController {
       const { password: _, ...adminData } = admin.get({ plain: true });
   
       return res.status(200).json({ admin: adminData });
+  }
+
+  static async getUserDetails(req: Request, res: Response) {
+  try {
+    const { user_id } = req.params;
+
+    const user = await User.findByPk(user_id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
     }
+
+    return res.status(200).json({ user });
+  } catch (error) {
+    return res.status(500).json({ message: "Server error", error });
+  }
+}
+
+static async updateName(req: Request, res: Response) {
+  try {
+    const { user_id } = req.params;
+    const { name } = req.body;
+
+    const user = await User.findByPk(user_id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    user.first_name = name;
+    await user.save(); // ✅ ensure DB is updated
+
+    return res.status(200).json({ user });
+  } catch (error) {
+    return res.status(500).json({ message: "Server error", error });
+  }
+}
 }

@@ -7,3 +7,5 @@ userRoutes.get("/healthCheck", UserController.healthCheck);
 userRoutes.post("/createUser", UserController.createUser);
 userRoutes.post("/login", UserController.login);
 userRoutes.post("/loginAsAdmin", UserController.loginAsAdmin);
+userRoutes.get("/getUserDetails/:user_id", UserController.getUserDetails);
+userRoutes.post("/updateName/:user_id", UserController.updateName);
