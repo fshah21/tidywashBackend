@@ -7,3 +7,4 @@ cartRoutes.post("/carts", CartController.createCart);
 cartRoutes.get("/carts/getActiveCartByCustomerId/:customer_id", CartController.getActiveCartByCustomerId);
 cartRoutes.get("/carts/getCartDetails/:cart_id", CartController.getCartDetails);
 cartRoutes.get("/carts/getCartById/:cart_id", CartController.getCartById);
+cartRoutes.put("/carts/emptyCart/:cart_id", CartController.emptyCart);

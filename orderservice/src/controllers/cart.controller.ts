@@ -139,4 +139,34 @@ export class CartController {
       cart: cart
     })
   }
+
+  static async emptyCart(req: Request, res: Response) {
+    const { cart_id } = req.params;
+
+    try {
+      // Find the cart first
+      const cart = await Cart.findByPk(cart_id);
+      if (!cart) {
+        return res.status(404).json({ message: "Cart not found" });
+      }
+
+      // Delete all items associated with this cart
+      await CartItem.destroy({
+        where: { cart_id: cart.id },
+      });
+
+      // Update the total amount to 0
+      cart.total_amount = 0;
+      await cart.save();
+
+      return res.status(200).json({
+        message: "Cart emptied successfully",
+        cart_id: cart.id,
+        total_amount: cart.total_amount,
+      });
+    } catch (error) {
+      console.error("Error emptying cart:", error);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  }
 }
