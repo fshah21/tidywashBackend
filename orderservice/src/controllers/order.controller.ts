@@ -506,7 +506,7 @@ export class OrderController {
       }
     }
 
-    static async generateOrderOTP(req: Request, res: Response) {
+    static async generateOTP(req: Request, res: Response) {
       const { order_id } = req.params;
       const { type } = req.body; // Expecting: pickup or delivery
 
@@ -524,13 +524,25 @@ export class OrderController {
         // Generate 6-digit OTP
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-        // Create or upsert confirmation
-        const confirmation = await OrderConfirmation.create({
-          order_id,
-          type,
-          otp,
-          file_url: null, // file will be uploaded later
+        // 🔑 Ensure uniqueness (order_id + type)
+        let confirmation = await OrderConfirmation.findOne({
+          where: { order_id, type },
         });
+
+        if (confirmation) {
+          // Update OTP if record already exists
+          confirmation.otp = otp;
+          confirmation.file_url = null; // reset file if needed
+          await confirmation.save();
+        } else {
+          // Create new record if not exists
+          confirmation = await OrderConfirmation.create({
+            order_id,
+            type,
+            otp,
+            file_url: null,
+          });
+        }
 
         // ✅ In production, you should send OTP via SMS or push notification
 
