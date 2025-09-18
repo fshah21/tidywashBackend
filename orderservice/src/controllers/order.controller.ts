@@ -800,10 +800,62 @@ export class OrderController {
           pickup_employee_id: employee_id,
         });
 
-        return res.status(200).json({ message: "Pickup started", order });
-      } catch (error) {
-        console.error("Error starting pickup:", error);
-        return res.status(500).json({ message: "Internal server error" });
+        // Generate 6-digit OTP
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        const type = "pickup";
+
+        // Create or upsert confirmation
+        const confirmation = await OrderConfirmation.create({
+          order_id,
+          type,
+          otp,
+          file_url: null, // file will be uploaded later
+        });
+
+        const customer = await OrderController.getCustomerById(order.customer_id);
+
+        const fcmToken = customer?.user?.device_tokens?.[0]; // Adjust key name based on your response
+        console.log("FCM TOKEN", fcmToken);
+        const notificationTitle = "Pickup OTP";
+        const notificationBody = `Your pickup OTP for order : #${order.ref_order_id} is ${otp}.`;
+
+        if (fcmToken) {
+          try {
+            await admin.messaging().send({
+              token: fcmToken,
+              notification: {
+                title: notificationTitle,
+                body: notificationBody,
+              },
+              data: {
+                orderId: order.id.toString(),
+                type,
+              },
+            });
+            console.log(`✅ Notification sent to ${fcmToken}`);
+          } catch (error) {
+            console.error(`❌ Failed to send notification:`, error?.message || error);
+            // Optional: handle specific error codes if needed
+            if (
+              error.code === "messaging/registration-token-not-registered" ||
+              error.code === "messaging/invalid-argument"
+            ) {
+              console.warn("⚠️ Invalid FCM token, consider removing it:", fcmToken);
+              // Optionally: mark this token as invalid in your DB
+            }
+          }
+        } else {
+          console.warn(`⚠️ No FCM token found for customer ID ${order.customer_id}`);
+        }
+
+        return res.status(200).json({
+          message: "OTP generated successfully",
+          order,
+          confirmation_id: confirmation.id,
+        });
+      } catch (err) {
+        console.error("Error generating OTP:", err);
+        return res.status(500).json({ error: "Internal server error" });
       }
     }
 
@@ -820,10 +872,62 @@ export class OrderController {
           delivery_employee_id: employee_id,
         });
 
-        return res.status(200).json({ message: "Delivery started", order });
-      } catch (error) {
-        console.error("Error starting delivery:", error);
-        return res.status(500).json({ message: "Internal server error" });
+         // Generate 6-digit OTP
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        const type = "delivery";
+
+        // Create or upsert confirmation
+        const confirmation = await OrderConfirmation.create({
+          order_id,
+          type,
+          otp,
+          file_url: null, // file will be uploaded later
+        });
+
+        const customer = await OrderController.getCustomerById(order.customer_id);
+
+        const fcmToken = customer?.user?.device_tokens?.[0]; // Adjust key name based on your response
+        console.log("FCM TOKEN", fcmToken);
+        const notificationTitle = "Delivery OTP";
+        const notificationBody = `Your delivery OTP for order : #${order.ref_order_id} is ${otp}.`;
+
+        if (fcmToken) {
+          try {
+            await admin.messaging().send({
+              token: fcmToken,
+              notification: {
+                title: notificationTitle,
+                body: notificationBody,
+              },
+              data: {
+                orderId: order.id.toString(),
+                type,
+              },
+            });
+            console.log(`✅ Notification sent to ${fcmToken}`);
+          } catch (error) {
+            console.error(`❌ Failed to send notification:`, error?.message || error);
+            // Optional: handle specific error codes if needed
+            if (
+              error.code === "messaging/registration-token-not-registered" ||
+              error.code === "messaging/invalid-argument"
+            ) {
+              console.warn("⚠️ Invalid FCM token, consider removing it:", fcmToken);
+              // Optionally: mark this token as invalid in your DB
+            }
+          }
+        } else {
+          console.warn(`⚠️ No FCM token found for customer ID ${order.customer_id}`);
+        }
+
+        return res.status(200).json({
+          message: "OTP generated successfully",
+          order,
+          confirmation_id: confirmation.id,
+        });
+      } catch (err) {
+        console.error("Error generating OTP:", err);
+        return res.status(500).json({ error: "Internal server error" });
       }
     }
 
