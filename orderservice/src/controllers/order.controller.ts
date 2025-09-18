@@ -156,10 +156,10 @@ export class OrderController {
 
         const customer = await OrderController.getCustomerById(order.customer_id);
 
-        if (status == "pickup_started" || status == "delivery_started") {
+        if (status == "pickup_started" || status == "out_for_delivery") {
           const fcmToken = customer?.user?.device_tokens?.[0]; // Adjust key name based on your response
           console.log("FCM TOKEN", fcmToken);
-          const notificationTitle = status === "pickup_started" ? "Pickup Started" : "Delivery Started";
+          const notificationTitle = status === "pickup_started" ? "Pickup Started" : "Out For Delivery";
           const notificationBody = status === "pickup_started" ? 
           `The Pickup for your order - #${order.ref_order_id} is started.` : `The Delivery for your order - #${order.ref_order_id} is started.`;
   
@@ -207,7 +207,7 @@ export class OrderController {
           }
         }
 
-        if (status == "pickup_completed") {
+        if (status == "wash_in_progress") {
           const fcmToken = customer?.user?.device_tokens?.[0]; // Adjust key name based on your response
           console.log("FCM TOKEN", fcmToken);
           const notificationTitle = "Pickup Completed";
@@ -614,13 +614,13 @@ export class OrderController {
                   {
                     [Op.and]: [
                       { pickup_date: { [Op.between]: [todayStart, todayEnd] } },
-                      { status: { [Op.notIn]: ["pickup_started", "delivery_started"] } },
+                      { status: { [Op.notIn]: ["pickup_started", "out_for_delivery"] } },
                     ],
                   },
                   {
                     [Op.and]: [
                       { delivery_date: { [Op.between]: [todayStart, todayEnd] } },
-                      { status: { [Op.notIn]: ["pickup_started", "delivery_started"] } },
+                      { status: { [Op.notIn]: ["pickup_started", "out_for_delivery"] } },
                     ],
                   },
                   {
@@ -631,14 +631,14 @@ export class OrderController {
                   },
                   {
                     [Op.and]: [
-                      { status: "delivery_started" },
+                      { status: "out_for_delivery" },
                       { delivery_employee_id: employee_id },
                     ],
                   },
                 ],
               },
               {
-                status: { [Op.not]: "delivery_completed" },
+                status: { [Op.not]: "delivered" },
               },
             ],
           },
@@ -719,13 +719,13 @@ export class OrderController {
                   {
                     [Op.and]: [
                       { pickup_date: { [Op.between]: [selectedDate, dayEnd] } },
-                      { status: { [Op.notIn]: ["pickup_started", "delivery_started"] } },
+                      { status: { [Op.notIn]: ["pickup_started", "out_for_delivery"] } },
                     ],
                   },
                   {
                     [Op.and]: [
                       { delivery_date: { [Op.between]: [selectedDate, dayEnd] } },
-                      { status: { [Op.notIn]: ["pickup_started", "delivery_started"] } },
+                      { status: { [Op.notIn]: ["pickup_started", "out_for_delivery"] } },
                     ],
                   },
                   {
@@ -736,14 +736,14 @@ export class OrderController {
                   },
                   {
                     [Op.and]: [
-                      { status: "delivery_started" },
+                      { status: "out_for_delivery" },
                       { delivery_employee_id: employee_id },
                     ],
                   },
                 ],
               },
               {
-                status: { [Op.not]: ["delivery_completed", "cancelled"] },
+                status: { [Op.not]: ["delivered", "cancelled"] },
               },
             ],
           },
@@ -880,7 +880,7 @@ export class OrderController {
         if (!order) return res.status(404).json({ message: "Order not found" });
 
         await order.update({
-          status: OrderStatus.DELIVERY_STARTED,
+          status: OrderStatus.OUT_FOR_DELIVERY,
           delivery_employee_id: employee_id,
         });
 
@@ -976,9 +976,9 @@ export class OrderController {
         }
 
         if (type === "pickup") {
-          order.status = OrderStatus.PICKUP_COMPLETED;
+          order.status = OrderStatus.WASH_IN_PROGRESS;
         } else if (type === "delivery") {
-          order.status = OrderStatus.DELIVERY_COMPLETED;
+          order.status = OrderStatus.DELIVERED;
         } else {
           return res.status(400).json({ message: "Invalid type" });
         }
