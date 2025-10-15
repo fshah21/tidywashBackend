@@ -3,7 +3,7 @@ import express from "express";
 import { json } from "body-parser";
 import cors from "cors";
 import { Sequelize } from "sequelize-typescript";
-import { runWith } from "firebase-functions";
+import * as functions from "firebase-functions/v2";
 import { orderRoutes } from "./routes/order.routes";
 import { cartRoutes } from "./routes/cart.routes";
 import { pricingRoutes } from "./routes/pricing.routes";
@@ -19,7 +19,7 @@ import { membershipRoutes } from "./routes/membership.routes";
 const app = express();
 const runtimeOpts = {
   timeoutSeconds: 300,
-  memory: "512MB" as "512MB",
+  memory: "512MiB" as const, // Use 'as const' so TypeScript treats it as literal
 };
 
 // CORS configuration
@@ -32,15 +32,8 @@ app.use("/api", cartRoutes);
 app.use("/api/pricing", pricingRoutes);
 app.use("/api", membershipRoutes);
 
-
-const PORT = process.env.PORT || 3000;
-
 app.get("/", (_req, res) => {
   res.send("Service is running!");
-});
-
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
 });
 
 let sequelize: Sequelize;
@@ -73,14 +66,12 @@ function getSequelizeInstance() {
     console.error("Unable to connect to the database:", error);
   });
 
-  exports.orderservice = runWith(runtimeOpts)
-  .region("asia-south1")
-  .https.onRequest(async (req, res) => {
-    try {
-      // Use the singleton instance
-      app(req, res); // handle the request
-    } catch (error) {
-      console.error("Unable to connect to the database:", error);
-      res.status(500).send("Failed to connect to the database." + error);
-    }
-  });
+export const orderservice = functions.https.onRequest(
+  {
+    ...runtimeOpts,
+    region: "asia-south1",
+  },
+  (req, res) => {
+    app(req, res);
+  }
+);

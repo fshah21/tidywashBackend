@@ -690,10 +690,10 @@ export class OrderController {
           }
         }
     
-        res.status(200).json(groupedBySlot);
+        return res.status(200).json(groupedBySlot);
       } catch (error) {
         console.error("Error fetching today's available orders:", error);
-        res.status(500).json({ message: "Internal server error" });
+        return res.status(500).json({ message: "Internal server error" });
       }
     }    
 
@@ -792,10 +792,10 @@ export class OrderController {
           }
         }
     
-        res.status(200).json(groupedBySlot);
+        return res.status(200).json(groupedBySlot);
       } catch (error) {
         console.error("Error fetching orders by date:", error);
-        res.status(500).json({ message: "Internal server error" });
+        return res.status(500).json({ message: "Internal server error" });
       }
     }    
 

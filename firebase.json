@@ -1,8 +1,8 @@
 {
   "functions": [
     {
-      "source": "userservice",
-      "codebase": "userservice_codebase",
+      "source": "orderservice",
+      "codebase": "orderservice_codebase",
       "ignore": [
         "node_modules",
         ".git",
