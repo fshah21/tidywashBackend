@@ -9,18 +9,18 @@ import { TimeSlot } from "../models/order.model";
 import admin from 'firebase-admin';
 import { CustomerMembership } from "../models/customerMemberships.model";
 
-if (!admin.apps.length) {
-  const serviceAccountJSON = Buffer.from(
-    process.env.FIREBASE_SERVICE_ACCOUNT_BASE64!,
-    'base64'
-  ).toString('utf-8');
+// if (!admin.apps.length) {
+//   const serviceAccountJSON = Buffer.from(
+//     process.env.FIREBASE_SERVICE_ACCOUNT_BASE64!,
+//     'base64'
+//   ).toString('utf-8');
 
-  const serviceAccount = JSON.parse(serviceAccountJSON);
+//   const serviceAccount = JSON.parse(serviceAccountJSON);
 
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-  });
-}
+//   admin.initializeApp({
+//     credential: admin.credential.cert(serviceAccount),
+//   });
+// }
 
 export class OrderController {
     static async healthCheck(_req: Request, res: Response) {
