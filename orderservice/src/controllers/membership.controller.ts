@@ -328,7 +328,7 @@ export class MembershipController {
             const memberships = await CustomerMembership.findAll({
               where: {
                 status: {
-                  [Op.notIn]: ["completed", "active"]
+                  [Op.notIn]: ["expired", "cancelled"]
                 }
               },
               order: [["created_date", "DESC"]]
