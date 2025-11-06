@@ -284,13 +284,13 @@ export class MembershipController {
 
     static async getCustomerById(customerId: String) {
         console.log("IN GET CUSTOMER ID", customerId);
-        const customer = await axios.get(`https://tidywashbackend.onrender.com/api/getCustomerById/${customerId}`);
+        const customer = await axios.get(`https://asia-south1-tidywash-front.cloudfunctions.net/userservice/api/getCustomerById/${customerId}`);
         return customer.data;
     }
 
     static async getAddress(addressId: String) {
         console.log("IN GET ADDRESS", addressId);
-        const address = await axios.get(`https://tidywashbackend.onrender.com/api/getAddressById/${addressId}`);
+        const address = await axios.get(`https://asia-south1-tidywash-front.cloudfunctions.net/userservice/api/getAddressById/${addressId}`);
         return address.data;
     }
 
@@ -338,7 +338,7 @@ export class MembershipController {
     
             const customerResponses = await Promise.all(
               customerIds.map(id =>
-                axios.get(`https://tidywashbackend.onrender.com/api/getCustomerById/${id}`)
+                axios.get(`https://asia-south1-tidywash-front.cloudfunctions.net/userservice/api/getCustomerById/${id}`)
                   .then(res => ({ id, data: res.data }))
                   .catch(err => ({ id, error: err.message }))
               )
